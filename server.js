@@ -1,5 +1,10 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import passport from 'passport';
+import dotenv from 'dotenv';
+
+import userRoutes from './routes/user.js';
+import authRoutes from './routes/auth.js';
 
 dotenv.config();
 
@@ -8,12 +13,12 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false}));
 
-const mongoDB_URI = 'mongodb+srv://argandd34:elice123123-@cluster0.ivnuzfd.mongodb.net/'
+const mongoDB_URI = 'mongodb+srv://argandd34:elice123123%21@cluster0.ivnuzfd.mongodb.net/'
 
 const startServer = async() => {
     try {
         await mongoose.connect(mongoDB_URI, {
-            useNewUrlParse: true,
+            useNewUrlParser: true,
             useUnifiedTopology: true
         });
         console.log('DB 접속 성공');
@@ -28,3 +33,5 @@ const startServer = async() => {
 
 startServer();
 
+app.use(authRoutes);
+app.use(userRoutes);
