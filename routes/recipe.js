@@ -3,12 +3,12 @@ import { recipeController } from "../controllers/recipeController";
 
 const recipeRouter = express.Router();
 
-recipeRouter.get("/api/recipe", recipeController.getRecipes);
+recipeRouter.get("/api/recipe", recipeController.getAllRecipes);
 
-recipeRouter.post("/api/recipe", recipeController.createRecipe);
-
-recipeRouter.delete("/api/recipe/:id", recipeController.deleteRecipe);
+recipeRouter.get("/api/recipe/:id", recipeController.getRecipe);
 
 recipeRouter.post("/api/recipe/write", recipeController.writeRecipe);
 
-export default { recipeRouter };
+recipeRouter.delete("/api/recipe/:id", recipeController.deleteRecipe);
+
+export default recipeRouter;
