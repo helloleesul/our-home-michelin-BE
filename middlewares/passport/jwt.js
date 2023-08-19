@@ -1,6 +1,10 @@
-import { Strategy as ExtractJwt, JwtStrategy } from 'passport-jwt';
+import pkg from 'passport-jwt';
 import dotenv from 'dotenv';
+
 dotenv.config();
+
+
+const { Strategy: JwtStrategy, ExtractJwt } = pkg;
 
 const extractJwtFromCookie = req => {
     return req.cookies.token

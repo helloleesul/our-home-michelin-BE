@@ -1,6 +1,6 @@
 import passport from 'passport';
-import local from './local';
-import jwt from './jwt';
+import local from './local.js';
+import jwt from './jwt.js';
 
 export default () => {
     passport.use(local);

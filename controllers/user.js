@@ -19,7 +19,7 @@ export const updateUser = async(req, res) => {
         res.json(user);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: '문제가 발생했씁니다.'});
+        res.status(500).json({ message: '문제가 발생했습니다.'});
     }
 };
 
