@@ -13,6 +13,7 @@ console.log(process.env.JWT_SECRET);
 const app = express();
 setUpPassport();
 
+app.use(passport.initialize());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false}));
 

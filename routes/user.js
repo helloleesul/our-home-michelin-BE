@@ -3,10 +3,10 @@ import { getUser, updateUser, deleteUser } from '../controllers/user.js';
 
 const router = express.Router();
 
-router.get('/api/user', getUser);
+router.get('/api/myinfo', getUser);
 
-router.post('/api/user/', updateUser);
+router.post('/api/myinfo/', updateUser);
 
-router.delete('/api/user/:id/', deleteUser);
+router.delete('/api/myinfo/:id/', deleteUser);
 
 export default router;
