@@ -10,7 +10,7 @@ const recipeSchema = new Schema(
     process: { type: Array, required: true},
     ingredient: { type: String, required: true },
     imageUrl: { type: String, required: true },
-    like: { type: Number, required: true}
+    likeCount: { type: Number, required: true}
   }
 );
 
