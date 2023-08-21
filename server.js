@@ -8,6 +8,7 @@ import setUpPassport from "./middlewares/passport/index.js";
 import userRoutes from "./routes/user.js";
 import authRoutes from "./routes/auth.js";
 import { sendVerificationCode, verifyCode } from "./controllers/mailer.js";
+import recipeRouter from "./routes/recipe.js";
 
 dotenv.config();
 console.log(process.env.JWT_SECRET);
@@ -23,7 +24,8 @@ app.use(express.urlencoded({ extended: false }));
 app.post("/signup", sendVerificationCode);
 app.post("/verify", verifyCode);
 
-const mongoDB_URI = "mongodb+srv://argandd34:elice123123%21@cluster0.ivnuzfd.mongodb.net/";
+const mongoDB_URI =
+  "mongodb+srv://argandd34:elice123123%21@cluster0.ivnuzfd.mongodb.net/";
 
 const startServer = async () => {
   try {
@@ -45,6 +47,7 @@ startServer();
 
 app.use(authRoutes);
 app.use(userRoutes);
+app.use(recipeRouter);
 
 app.use((error, req, res, next) => {
   console.error(error);
