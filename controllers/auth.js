@@ -8,7 +8,7 @@ export const login = (req, res) => {
   } catch (err) {
     res.status(500).send("로그인에 실패했습니다.");
   }
-  res.redirect("/");
+  // res.redirect("/");
 };
 
 export const join = async (req, res) => {
@@ -20,7 +20,7 @@ export const join = async (req, res) => {
     if (!existingUser) {
       await User.create({
         email,
-        name,
+        nickname,
         password: hashedPassword,
       });
       return res.json({ message: "회원가입이 성공적으로 완료되었습니다." });

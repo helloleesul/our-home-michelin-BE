@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import passport from "passport";
 import dotenv from "dotenv";
+import cors from "cors";
 import setUpPassport from "./middlewares/passport/index.js";
 
 import userRoutes from "./routes/user.js";
@@ -13,6 +14,10 @@ console.log(process.env.JWT_SECRET);
 
 const app = express();
 setUpPassport();
+
+app.use(cors({
+  origin: 'http://localhost:3000'
+}));
 
 app.use(passport.initialize());
 app.use(express.json());
@@ -32,8 +37,8 @@ const startServer = async () => {
     });
     console.log("DB 접속 성공");
 
-    app.listen(3000, () => {
-      console.log("3000포트에서 서버가 작동중");
+    app.listen(3001, () => {
+      console.log("3001포트에서 서버가 작동중");
     });
   } catch (error) {
     console.error("DB 접속 실패", error);
