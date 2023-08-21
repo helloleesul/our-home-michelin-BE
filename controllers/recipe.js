@@ -28,44 +28,37 @@ export const getRecipe = async (req, res) => {
 };
 
 export const writeRecipe = async (req, res) => {
-  const {
-    title,
-    description,
-    recipeType,
-    recipeServing,
-    process,
-    ingredient,
-    imageUrl,
-  } = req.body;
-  // 레시피 id 질문하기!!
-  // const recipeId = recipes.length + 1; // 임시 ID <-- mongoDB 고유 objectID 사용하기.
-
   try {
-    const newRecipe = new Recipe({
-      recipeId: recipes.length + 1,
+    const { title, recipeType, recipeServing, process, ingredients, imageUrl } =
+      req.body;
+
+    const recipe = await Recipe.create({
       title,
-      description,
       recipeType,
       recipeServing,
       process,
-      ingredient,
+      ingredients,
       imageUrl,
-      like: 0, // '좋아요' 수 기본값: 0
+      likeCount: 0,
     });
 
-    await newRecipe.save();
-
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ message: "문제가 발생했습니다." });
+    res.json(recipe);
+  } catch (err) {
+    res.status(500).send("레시피 등록 과정에서 오류가 발생되었습니다.");
   }
 };
 
-export const deleteRecipe = (req, res) => {
-  const recipeId = parseInt(req.params.recipeId);
+export const deleteRecipe = async (req, res) => {
+  // try, catch 공통적으로..
+  const recipeId = req.recipe._id;
 
-  // 해당 ID를 가진 레시피 삭제
-  recipes = recipes.filter((recipe) => recipe.recipeId !== recipeId);
-
-  res.json({ success: true });
+  try {
+    const deletedRecipe = await Recipe.findByIdAndDelete(recipeId);
+    if (!deletedRecipe) {
+      return res.status(404).json({ message: "레시피를 찾을 수 없습니다 :(" });
+    }
+    return res.json({ message: "레시피 삭제가 완료되었습니다." });
+  } catch (err) {
+    res.status(500).json({ message: "문제가 발생했습니다." });
+  }
 };
