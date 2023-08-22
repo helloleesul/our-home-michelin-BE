@@ -5,11 +5,11 @@ let recipes = []; // 가상의 레시피 데이터
 // 전체 레시피 조회
 export const getAllRecipes = async (req, res) => {
     try {
-        const size = parseInt(req.query.size) || 0;
+        const limit = parseInt(req.query.limit) || 0;
         let allRecipes;
 
-        if (size > 0) {
-            allRecipes = await Recipe.find().limit(size);
+        if (limit > 0) {
+            allRecipes = await Recipe.find().limit(limit);
         } else {
             allRecipes = await Recipe.find();
         }
