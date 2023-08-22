@@ -55,8 +55,8 @@ export const writeRecipe = async (req, res) => {
 };
 
 export const deleteRecipe = async (req, res) => {
-    // try, catch 공통적으로..
-    const recipeId = req.recipe._id;
+  // try, catch 공통적으로..
+  const recipeId = req.params.id;
 
     try {
         const deletedRecipe = await Recipe.findByIdAndDelete(recipeId);
