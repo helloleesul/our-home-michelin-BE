@@ -17,7 +17,6 @@ export const updateUser = async (req, res) => {
         const userUpdateData = {
             nickName,
             email,
-            role,
         };
 
         const updatedUser = await User.findByIdAndUpdate(req.user._id, userUpdateData, { new: true });
