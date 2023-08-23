@@ -1,4 +1,5 @@
 import User from "../models/user.js";
+import hashPassword from "../middlewares/hashpassword.js";
 
 export const getUser = async (req, res) => {
     try {
@@ -12,16 +13,19 @@ export const getUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
     try {
-        const { nickName, email } = req.body;
+        const { nickName, email, password } = req.body;
+
+        const hashedPassword = await hashPassword(password);
 
         const userUpdateData = {
             nickName,
             email,
+            password: hashedPassword,
         };
 
         const updatedUser = await User.findByIdAndUpdate(req.user._id, userUpdateData, { new: true });
 
-        if (!updateUser) throw Error("존재하지 않는 회원입니다.");
+        if (!updatedUser) throw Error("존재하지 않는 회원입니다.");
 
         res.json(updatedUser);
     } catch (err) {
