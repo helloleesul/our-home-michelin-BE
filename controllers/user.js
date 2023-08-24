@@ -35,17 +35,6 @@ export const updateUser = async (req, res) => {
     }
 };
 
-// export const deleteUser = async (req, res) => {
-//     try {
-//         const user = await User.findByIdAndDelete(req.user._id);
-//         if (!user) throw Error("존재하지 않는 회원입니다.");
-//         res.json({ message: "회원탈퇴가 완료되었습니다." });
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ message: "문제가 발생했습니다." });
-//     }
-// };
-
 export const deleteUser = async (req, res, next) => {
     try {
         const user = await User.findById(req.user._id);
@@ -57,7 +46,7 @@ export const deleteUser = async (req, res, next) => {
         if (!isMatch) {
             return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." });
         }
-        await user.remove();
+        await User.findByIdAndDelete(req.user._id);
 
         res.json({ message: "회원탈퇴가 완료되었습니다." });
     } catch (err) {
