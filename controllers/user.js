@@ -46,7 +46,7 @@ export const deleteUser = async (req, res) => {
     }
 };
 
-export const verifyPassword = async (req, res, next) => {
+export const confirmPassword = async (req, res, next) => {
     try {
         const user = await User.findById(req.user._id);
 
@@ -57,7 +57,7 @@ export const verifyPassword = async (req, res, next) => {
             error.status = 400;
             throw error;
         }
-        next();
+        res.json({ message: "비밀번호 확인 성공" });
     } catch (err) {
         next(err);
     }
