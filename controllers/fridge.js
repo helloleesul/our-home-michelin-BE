@@ -2,9 +2,13 @@ import Fridge from "../models/fridge.js";
 
 export const getIngredients = async (req, res) => {
     try {
-        const userId = req.params.userId;
-        const ingredients = await Fridge.find({ userId: userId });
-        res.json(ingredients);
+        const userId = req.user._id;
+        const userFridge = await Fridge.findOne({ userId: userId });
+
+        if (!userFridge) {
+            return res.status(404).json({ message: "냉장고를 찾을 수 없습니다." });
+        }
+        res.json(userFridge.ingredients);
     } catch (error) {
         next(error);
     }
@@ -12,13 +16,21 @@ export const getIngredients = async (req, res) => {
 
 export const addIngredient = async (req, res, next) => {
     try {
-        const userId = req.params.userId;
-        const ingredient = new Fridge({
-            ...req.body,
-            userId: userId,
-        });
-        await ingredient.save();
-        res.status(201).send(ingredient);
+        const userId = req.user._id;
+        const newIngredient = {
+            ingredientName: req.body.ingredientName,
+            bestBefore: req.body.bestBefore,
+        };
+
+        let userFridge = await Fridge.findOne({ userId: userId });
+
+        if (!userFridge) {
+            userFridge = new Fridge({ userId: userId, ingredients: [newIngredient] });
+        } else {
+            userFridge.ingredients.push(newIngredient);
+        }
+        await userFridge.save();
+        res.status(201).send(newIngredient);
     } catch (error) {
         next(error);
     }
@@ -26,13 +38,17 @@ export const addIngredient = async (req, res, next) => {
 
 export const deleteIngredient = async (req, res, next) => {
     try {
+        const userId = req.user._id;
         const ingredientId = req.params.ingredientId;
-        const deletedIngredient = await Fridge.findByIdAndDelete(ingredientId);
 
-        if (!deletedIngredient) {
-            const error = new Error("해당 재료를 찾을 수 없습니다.");
-            error.status = 404;
-            throw error;
+        const updatedFridge = await Fridge.findOneAndUpdate(
+            { userId: userId },
+            { $pull: { ingredients: { _id: ingredientId } } },
+            { new: true }
+        );
+
+        if (!updatedFridge) {
+            return res.status(404).json({ message: "냉장고를 찾을 수 없습니다." });
         }
 
         res.status(200).json({ message: "재료가 삭제되었습니다." });

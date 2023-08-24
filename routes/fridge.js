@@ -4,10 +4,15 @@ import verifyCookie from "../middlewares/verifyCookie.js";
 
 const router = express.Router();
 
-router.get("/api/user/:userId/fridge", verifyCookie, getIngredients);
+router.get("/api/myfridge", passport.authenticate("jwt", { session: false }), verifyCookie, getIngredients);
 
-router.post("/api/user/:userId/fridge", verifyCookie, addIngredient);
+router.post("/api/myfridge", passport.authenticate("jwt", { session: false }), verifyCookie, addIngredient);
 
-router.delete("/api/user/:userId/fridge/:ingredientId", verifyCookie, deleteIngredient);
+router.delete(
+    "/api/myfridge/:ingredientId",
+    passport.authenticate("jwt", { session: false }),
+    verifyCookie,
+    deleteIngredient
+);
 
 export default router;
