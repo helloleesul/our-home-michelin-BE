@@ -1,5 +1,6 @@
 import User from "../models/user.js";
 import hashPassword from "../middlewares/hashpassword.js";
+import bcrypt from "bcrypt";
 
 export const getUser = async (req, res) => {
     try {
@@ -42,5 +43,22 @@ export const deleteUser = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "문제가 발생했습니다." });
+    }
+};
+
+export const verifyPassword = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user._id);
+
+        const isMatch = await bcrypt.compare(req.body.password, user.password);
+
+        if (!isMatch) {
+            const error = new Error("비밀번호가 일치하지 않습니다.");
+            error.status = 400;
+            throw error;
+        }
+        next();
+    } catch (err) {
+        next(err);
     }
 };

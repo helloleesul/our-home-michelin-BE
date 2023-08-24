@@ -5,10 +5,10 @@ import passport from "passport";
 
 const router = express.Router();
 
-router.get("/api/myinfo", passport.authenticate('jwt', {session: false}),verifyCookie, getUser);
+router.get("/api/myinfo", passport.authenticate("jwt", { session: false }), verifyCookie, getUser);
 
-router.post("/api/myinfo", passport.authenticate('jwt', {session: false}), verifyCookie, updateUser);
+router.put("/api/myinfo", passport.authenticate("jwt", { session: false }), verifyCookie, updateUser);
 
-router.delete("/api/myinfo", passport.authenticate('jwt', {session: false}),verifyCookie, deleteUser);
+router.delete("/api/myinfo", passport.authenticate("jwt", { session: false }), verifyCookie, deleteUser);
 
 export default router;
