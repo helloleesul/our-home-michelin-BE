@@ -3,16 +3,30 @@ import User from "../models/user.js";
 import Editor from "../models/editor.js";
 
 // (postman 체크 O) 전체 레시피 조회
+// 실행 시, .slice 하면 에러 발생 Cannot read properties of undefined (reading 'slice')
+// export const getAllRecipes = async (req, res) => {
+//   try {
+//     const limit = parseInt(req.query.limit) || 0; // 0 아니고 default값을 두는 게 좋지 않을지? // limit은 되는데, front slice했을 때 에러 발생
+//     let allRecipes;
+
+//     if (limit > 0) {
+//       allRecipes = await Recipe.find().sort({ createdDate: -1 }).limit(limit);
+//     } else {
+//       allRecipes = await Recipe.find().sort({ createdDate: -1 });
+//     }
+//     res.status(200).json(allRecipes);
+//   } catch (err) {
+//     res.status(500).json({ message: "문제가 발생했습니다." });
+//   }
+// };
 export const getAllRecipes = async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit) || 0; // 0 아니고 default값을 두는 게 좋지 않을지?
-    let allRecipes;
+    const allRecipes = await Recipe.find()
+      .sort({ createdDate: -1 })
+      .limit(limit);
+    console.log("allRecipes");
+    console.log(allRecipes);
 
-    if (limit > 0) {
-      allRecipes = await Recipe.find().sort({ createdDate: -1 }).limit(limit);
-    } else {
-      allRecipes = await Recipe.find().sort({ createdDate: -1 });
-    }
     res.status(200).json(allRecipes);
   } catch (err) {
     res.status(500).json({ message: "문제가 발생했습니다." });
@@ -41,9 +55,12 @@ export const getFiveStarRecipes = async (req, res) => {
     // 1스타 ~ 5스타 인데
     // 제가 작성한 'id: 1234' 레시피에 좋아요 개수가 89개 -> 이 레시피는 4스타 -> 에디터 X (5스타)
     // 에디터가 되는 조건은 5스타를 받은 레시피가 있는 유저 + 경연님 작성 레시피가 10개 && 10개 다 5스타
-    const fiveStarRecipes = await Recipe.find({ likeCount: { $gte: 20 } }).sort(
-      { likeCount: -1 }
-    );
+    const limit = 5;
+    const fiveStarRecipes = await Recipe.find({
+      likeCount: { $gte: 100 },
+    })
+      .sort({ likeCount: -1 })
+      .limit(limit);
     res
       .status(200)
       .json({ message: "5스타 레시피 목록 조회 성공", fiveStarRecipes });
@@ -76,11 +93,18 @@ export const getEditorsRecipes = async (req, res) => {
   }
 };
 
-// (postman 체크 O) 레시피 작성
+// (백 & 프론트 체크 O) 레시피 작성
 export const writeRecipe = async (req, res) => {
   try {
-    const { title, recipeType, recipeServing, process, ingredients, imageUrl } =
-      req.body;
+    const {
+      title,
+      recipeType,
+      recipeServing,
+      process,
+      ingredients,
+      imageUrl,
+      createdDate,
+    } = req.body;
 
     const recipe = await Recipe.create({
       title,
@@ -90,11 +114,13 @@ export const writeRecipe = async (req, res) => {
       ingredients,
       imageUrl,
       likeCount: 0,
+      createdDate,
     });
 
     res.json(recipe);
   } catch (err) {
     res.status(500).send("레시피 등록 과정에서 오류가 발생되었습니다.");
+    console.log(err);
   }
 };
 
