@@ -1,5 +1,5 @@
 import express from "express";
-import { getIngredients, addIngredient, deleteIngredient } from "../controllers/fridge.js";
+import { getIngredients, addIngredients, deleteIngredients } from "../controllers/fridge.js";
 import verifyCookie from "../middlewares/verifyCookie.js";
 import passport from "passport";
 
@@ -7,13 +7,8 @@ const router = express.Router();
 
 router.get("/api/myfridge", passport.authenticate("jwt", { session: false }), verifyCookie, getIngredients);
 
-router.post("/api/myfridge", passport.authenticate("jwt", { session: false }), verifyCookie, addIngredient);
+router.post("/api/myfridge", passport.authenticate("jwt", { session: false }), verifyCookie, addIngredients);
 
-router.delete(
-    "/api/myfridge/:ingredientId",
-    passport.authenticate("jwt", { session: false }),
-    verifyCookie,
-    deleteIngredient
-);
+router.delete("/api/myfridge", passport.authenticate("jwt", { session: false }), verifyCookie, deleteIngredients);
 
 export default router;

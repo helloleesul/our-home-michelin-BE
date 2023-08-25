@@ -1,6 +1,6 @@
 import Fridge from "../models/fridge.js";
 
-export const getIngredients = async (req, res) => {
+export const getIngredients = async (req, res, next) => {
     try {
         const userId = req.user._id;
         const userFridge = await Fridge.findOne({ userId: userId });
@@ -14,36 +14,38 @@ export const getIngredients = async (req, res) => {
     }
 };
 
-export const addIngredient = async (req, res, next) => {
+export const addIngredients = async (req, res, next) => {
     try {
         const userId = req.user._id;
-        const newIngredient = {
-            ingredientName: req.body.ingredientName,
-            bestBefore: req.body.bestBefore,
-        };
+        let newIngredients = req.body.ingredients;
+
+        newIngredients = newIngredients.map((ingredient) => ({
+            ...ingredient,
+            inputDate: new Date(),
+        }));
 
         let userFridge = await Fridge.findOne({ userId: userId });
 
         if (!userFridge) {
-            userFridge = new Fridge({ userId: userId, ingredients: [newIngredient] });
+            userFridge = new Fridge({ userId: userId, ingredients: newIngredients });
         } else {
-            userFridge.ingredients.push(newIngredient);
+            userFridge.ingredients.push(...newIngredients);
         }
         await userFridge.save();
-        res.status(201).send(newIngredient);
+        res.status(201).send(newIngredients);
     } catch (error) {
         next(error);
     }
 };
 
-export const deleteIngredient = async (req, res, next) => {
+export const deleteIngredients = async (req, res, next) => {
     try {
         const userId = req.user._id;
-        const ingredientId = req.params.ingredientId;
+        const ingredientIds = req.body.ingredientIds;
 
         const updatedFridge = await Fridge.findOneAndUpdate(
             { userId: userId },
-            { $pull: { ingredients: { _id: ingredientId } } },
+            { $pull: { ingredients: { _id: { $in: ingredientIds } } } },
             { new: true }
         );
 
