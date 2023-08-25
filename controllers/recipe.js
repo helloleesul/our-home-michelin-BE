@@ -3,30 +3,27 @@ import User from "../models/user.js";
 import Editor from "../models/editor.js";
 
 // (postman 체크 O) 전체 레시피 조회
-// 실행 시, .slice 하면 에러 발생 Cannot read properties of undefined (reading 'slice')
-// export const getAllRecipes = async (req, res) => {
-//   try {
-//     const limit = parseInt(req.query.limit) || 0; // 0 아니고 default값을 두는 게 좋지 않을지? // limit은 되는데, front slice했을 때 에러 발생
-//     let allRecipes;
-
-//     if (limit > 0) {
-//       allRecipes = await Recipe.find().sort({ createdDate: -1 }).limit(limit);
-//     } else {
-//       allRecipes = await Recipe.find().sort({ createdDate: -1 });
-//     }
-//     res.status(200).json(allRecipes);
-//   } catch (err) {
-//     res.status(500).json({ message: "문제가 발생했습니다." });
-//   }
-// };
+// 실행 시, .slice 하면 에러 발생 Cannot read properties of undefined (reading 'slice') -- 프론트 오피스아워때 질문 해보기로 (선정님)
 export const getAllRecipes = async (req, res) => {
   try {
-    const allRecipes = await Recipe.find()
-      .sort({ createdDate: -1 })
-      .limit(limit);
-    console.log("allRecipes");
-    console.log(allRecipes);
+    const defaultLimit = await Recipe.countDocuments(); // defaultLimit - 전체 레시피 수
+    const limit = parseInt(req.query.limit) || defaultLimit;
+    let allRecipes;
 
+    if (limit !== defaultLimit) {
+      if (limit > 0) {
+        allRecipes = await Recipe.find().sort({ createdDate: -1 }).limit(limit);
+      } else {
+        // limit 값이 음의 정수인 경우 -> defaultLimit
+        allRecipes = await Recipe.find()
+          .sort({ createdDate: -1 })
+          .limit(defaultLimit);
+      }
+    } else {
+      allRecipes = await Recipe.find()
+        .sort({ createdDate: -1 })
+        .limit(defaultLimit);
+    }
     res.status(200).json(allRecipes);
   } catch (err) {
     res.status(500).json({ message: "문제가 발생했습니다." });
@@ -51,21 +48,40 @@ export const getRecipe = async (req, res) => {
 // (postman 체크 O) 5스타 레시피(=인기 레시피) 조회
 export const getFiveStarRecipes = async (req, res) => {
   try {
-    // 좋아요 20개 이상(스타가 1개라도 있는 레시피)인 레시피를 불러온다.
-    // 1스타 ~ 5스타 인데
-    // 제가 작성한 'id: 1234' 레시피에 좋아요 개수가 89개 -> 이 레시피는 4스타 -> 에디터 X (5스타)
-    // 에디터가 되는 조건은 5스타를 받은 레시피가 있는 유저 + 경연님 작성 레시피가 10개 && 10개 다 5스타
-    const limit = 5;
-    const fiveStarRecipes = await Recipe.find({
+    const defaultLimit = await Recipe.countDocuments({
       likeCount: { $gte: 100 },
-    })
-      .sort({ likeCount: -1 })
-      .limit(limit);
+    }); // defaultLimit - '좋아요' 100개 이상의 글의 '수'
+    const limit = parseInt(req.query.limit) || defaultLimit;
+    let fiveStarRecipes;
+
+    if (limit !== defaultLimit) {
+      if (limit > 0) {
+        fiveStarRecipes = await Recipe.find({
+          likeCount: { $gte: 100 },
+        })
+          .sort({ likeCount: -1 })
+          .limit(limit);
+      } else {
+        // limit 값이 음의 정수인 경우 -> defaultLimit
+        fiveStarRecipes = await Recipe.find({
+          likeCount: { $gte: 100 },
+        })
+          .sort({ likeCount: -1 })
+          .limit(defaultLimit);
+      }
+    } else {
+      fiveStarRecipes = await Recipe.find({
+        likeCount: { $gte: 100 },
+      })
+        .sort({ likeCount: -1 })
+        .limit(defaultLimit);
+    }
     res
       .status(200)
       .json({ message: "5스타 레시피 목록 조회 성공", fiveStarRecipes });
   } catch (err) {
     res.status(500).json({ message: "문제가 발생했습니다." });
+    console.log(err);
   }
 };
 
