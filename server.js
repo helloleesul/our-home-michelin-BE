@@ -25,23 +25,22 @@ app.use(express.urlencoded({ extended: false }));
 app.post("/signup", sendVerificationCode);
 app.post("/verify", verifyCode);
 
-const mongoDB_URI =
-  "mongodb+srv://argandd34:elice123123%21@cluster0.ivnuzfd.mongodb.net/";
+const mongoDB_URI = "mongodb+srv://argandd34:elice123123%21@cluster0.ivnuzfd.mongodb.net/";
 
 const startServer = async () => {
-  try {
-    await mongoose.connect(mongoDB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("DB 접속 성공");
+    try {
+        await mongoose.connect(mongoDB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        console.log("DB 접속 성공");
 
-    app.listen(3001, () => {
-      console.log("3001포트에서 서버가 작동중");
-    });
-  } catch (error) {
-    console.error("DB 접속 실패", error);
-  }
+        app.listen(3001, () => {
+            console.log("3001포트에서 서버가 작동중");
+        });
+    } catch (error) {
+        console.error("DB 접속 실패", error);
+    }
 };
 
 startServer();
@@ -52,10 +51,10 @@ app.use(recipeRouter);
 app.use(fridgeRouter);
 
 app.use((error, req, res, next) => {
-  console.error(error);
-  const status = error.status ?? 500;
-  res.status(status).json({
-    error: error.message,
-    data: null,
-  });
+    console.error(error);
+    const status = error.status ?? 500;
+    res.status(status).json({
+        error: error.message,
+        data: null,
+    });
 });

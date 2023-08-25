@@ -20,6 +20,13 @@ export const login = (req, res, next) => {
 export const join = async (req, res, next) => {
     try {
         const { email, nickName, password } = req.body;
+
+        if (!userVerificationStatus.get(email)) {
+            const error = new Error("이메일 인증이 필요합니다.");
+            error.status = 400;
+            throw error;
+        }
+
         const existingUser = await User.findOne({ email });
 
         if (existingUser) {
@@ -42,7 +49,7 @@ export const join = async (req, res, next) => {
 };
 
 export const checkLogin = (req, res) => {
-    passport.authenticate("jwt", { session: false }, (err, user, info) => {
+    passport.authenticate("jwt", { session: false }, (err, user) => {
         if (err) return res.status(500).json(err);
         if (!user) return res.json({ isAuthenticated: false });
         return res.json({ isAuthenticated: true, user });
