@@ -9,7 +9,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-const userVerificationStatus = new Map();
+export const userVerificationStatus = new Map();
 
 const userVerificationCodes = new Map();
 
@@ -19,7 +19,7 @@ export const sendVerificationCode = async (req, res, next) => {
     const verificationCode = crypto.randomBytes(4).toString("hex");
     const expiryTime = Date.now() + 3 * 60 * 1000;
     userVerificationCodes.set(email, { code: verificationCode, expiryTime: expiryTime, attempts: 0 });
-
+    console.log("Current userVerificationCodes:", userVerificationCodes);
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: email,
@@ -31,11 +31,13 @@ export const sendVerificationCode = async (req, res, next) => {
         await transporter.sendMail(mailOptions);
         res.send("인증 코드를 보냈습니다!");
     } catch (error) {
+        console.error("Mailer error:", error);
         next(new Error("인증 코드 전송 중 오류가 발생했습니다."));
     }
 };
 
 export const verifyCode = (req, res, next) => {
+    console.log("Stored Code:", req.body);
     const { email, code } = req.body;
 
     const storedData = userVerificationCodes.get(email);
@@ -66,6 +68,7 @@ export const verifyCode = (req, res, next) => {
         userVerificationCodes.delete(email);
 
         userVerificationStatus.set(email, true);
+        console.log(`Email ${email} verified!`);
 
         next();
     } else {

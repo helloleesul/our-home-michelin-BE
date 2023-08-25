@@ -2,6 +2,7 @@ import User from "../models/user.js";
 import hashPassword from "../middlewares/hashpassword.js";
 import generateToken from "../middlewares/token.js";
 import passport from "passport";
+import { userVerificationStatus } from "../controllers/mailer.js";
 
 export const login = (req, res, next) => {
     try {
@@ -54,4 +55,9 @@ export const checkLogin = (req, res) => {
         if (!user) return res.json({ isAuthenticated: false });
         return res.json({ isAuthenticated: true, user });
     })(req, res);
+};
+
+export const logout = (req, res) => {
+    res.clearCookie("t");
+    res.status(200).send("Logged out successfully");
 };
