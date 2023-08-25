@@ -14,7 +14,7 @@ const recipeSchema = new Schema({
   recipeType: { type: String, required: true },
   process: { type: Array, required: true },
   ingredients: { type: [ingredientObj], required: true }, // ingredient collection이 있어야할 것 같다.
-  imageUrl: { type: String, required: true }, // multer
+  imageUrl: { type: String, required: false }, // multer 적용 전까지는 post 테스트 등을 위해 'false'로 잠시 변경
   likeCount: { type: Number, required: true },
   writerId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // ObjectId, userId ... // '레시피 작성자' 넣어야 함. type: String (?) -- owner id
   createdDate: { type: Date, default: Date.now }, // '최신순' 정렬을 위하여 레시피 작성 날짜 필요
