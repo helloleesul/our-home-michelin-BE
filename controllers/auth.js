@@ -59,5 +59,5 @@ export const checkLogin = (req, res) => {
 
 export const logout = (req, res) => {
     res.clearCookie("t");
-    res.status(200).send("Logged out successfully");
+    res.status(200).send("로그아웃 되었습니다.");
 };
