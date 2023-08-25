@@ -49,29 +49,29 @@ export const getRecipe = async (req, res) => {
 export const getFiveStarRecipes = async (req, res) => {
   try {
     const defaultLimit = await Recipe.countDocuments({
-      likeCount: { $gte: 100 },
-    }); // defaultLimit - '좋아요' 100개 이상의 글의 '수'
+      likeCount: { $gte: 20 },
+    }); // defaultLimit - '좋아요' 20개 이상의 글의 '수'
     const limit = parseInt(req.query.limit) || defaultLimit;
     let fiveStarRecipes;
 
     if (limit !== defaultLimit) {
       if (limit > 0) {
         fiveStarRecipes = await Recipe.find({
-          likeCount: { $gte: 100 },
+          likeCount: { $gte: 20 },
         })
           .sort({ likeCount: -1 })
           .limit(limit);
       } else {
         // limit 값이 음의 정수인 경우 -> defaultLimit
         fiveStarRecipes = await Recipe.find({
-          likeCount: { $gte: 100 },
+          likeCount: { $gte: 20 },
         })
           .sort({ likeCount: -1 })
           .limit(defaultLimit);
       }
     } else {
       fiveStarRecipes = await Recipe.find({
-        likeCount: { $gte: 100 },
+        likeCount: { $gte: 20 },
       })
         .sort({ likeCount: -1 })
         .limit(defaultLimit);
