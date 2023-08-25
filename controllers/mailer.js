@@ -69,8 +69,7 @@ export const verifyCode = (req, res, next) => {
 
         userVerificationStatus.set(email, true);
         console.log(`Email ${email} verified!`);
-
-        next();
+        res.status(200).json({ message: "인증 성공!" });
     } else {
         const error = new Error("유효하지 않은 코드입니다.");
         error.status = 400;
