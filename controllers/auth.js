@@ -1,6 +1,6 @@
 import User from "../models/user.js";
-import hashPassword from "../middlewares/hashpassword.js";
-import generateToken from "../middlewares/token.js";
+import hashPassword from "../utils/hashpassword.js";
+import generateToken from "../utils/token.js";
 import passport from "passport";
 import { userVerificationStatus } from "../controllers/mailer.js";
 

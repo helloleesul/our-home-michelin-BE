@@ -1,5 +1,5 @@
 import User from "../models/user.js";
-import hashPassword from "../middlewares/hashpassword.js";
+import hashPassword from "../utils/hashpassword.js";
 import bcrypt from "bcrypt";
 
 export const getUser = async (req, res) => {

@@ -25,6 +25,10 @@ app.use(express.urlencoded({ extended: false }));
 app.post("/signup", sendVerificationCode);
 app.post("/verify", verifyCode);
 
+const { MONGODB_USERNAME, MONGODB_PASSWORD, MONGODB_CLUSTER, MONGODB_DB_NAME } = process.env;
+
+//const mongoDB_URI = `mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_CLUSTER}/`;
+
 const mongoDB_URI = "mongodb+srv://argandd34:elice123123%21@cluster0.ivnuzfd.mongodb.net/";
 
 const startServer = async () => {
