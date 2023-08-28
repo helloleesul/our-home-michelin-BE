@@ -12,12 +12,12 @@ export const getEditorRecipes = async (req, res, next) => {
         .json({ message: "해당 ID의 에디터를 찾을 수 없습니다." });
     }
 
-    const recipes = await Recipe.find({ writerId: editorId }).populate(
-      "writerId",
+    const recipes = await Recipe.find({ writer: editorId }).populate(
+      "writer",
       "nickName"
     );
 
-    if (!recipes.legnth) {
+    if (!recipes.length) {
       return res
         .status(404)
         .json({ message: "해당 에디터의 레시피를 찾을 수 없습니다." });
