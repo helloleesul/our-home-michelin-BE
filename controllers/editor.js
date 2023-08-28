@@ -43,18 +43,18 @@ export const getEditorRecipes = async (req, res, next) => {
 export const getAllEditors = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
+    const limit = parseInt(req.query.limit) || 6;
 
     const skip = (page - 1) * limit;
 
     const total = await User.countDocuments({ role: 1 });
 
-    consteditors = await User.find({ role: 1 })
+    const editors = await User.find({ role: 1 })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    if (!getEditorsRecipes.length) {
+    if (!editors.length) {
       return res.status(404).json({ message: "에디터를 찾을 수 없습니다. " });
     }
 

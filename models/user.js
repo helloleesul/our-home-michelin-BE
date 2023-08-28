@@ -7,7 +7,7 @@ const userSchema = new Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
   role: { type: Number, required: true, default: 0 },
-  profileImageURL: { type: String, required: true },
+  profileImageURL: { type: String, required: false, default: "" },
 });
 
 export default mongoose.model("User", userSchema);
