@@ -54,7 +54,9 @@ export const getMyRecipes = async (req, res) => {
     const userId = req.user._id;
     console.log(">> userId");
     console.log(userId);
-    const myRecipes = await Recipe.find({ writer });
+    const myRecipes = await Recipe.find({ writer: userId });
+    console.log(">> myRecipes");
+    console.log(myRecipes);
 
     res.status(200).json(myRecipes);
   } catch (err) {
