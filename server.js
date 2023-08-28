@@ -10,6 +10,7 @@ import authRoutes from "./routes/auth.js";
 import { sendVerificationCode, verifyCode } from "./controllers/mailer.js";
 import recipeRouter from "./routes/recipe.js";
 import fridgeRouter from "./routes/fridge.js";
+import editorRouter from "./routes/editor.js";
 
 dotenv.config();
 console.log(process.env.JWT_SECRET);
@@ -24,6 +25,21 @@ app.use(express.urlencoded({ extended: false }));
 
 app.post("/signup", sendVerificationCode);
 app.post("/verify", verifyCode);
+
+app.use(authRoutes);
+app.use(userRoutes);
+app.use(recipeRouter);
+app.use(fridgeRouter);
+app.use(editorRouter);
+
+app.use((error, req, res, next) => {
+  console.error(error);
+  const status = error.status ?? 500;
+  res.status(status).json({
+    error: error.message,
+    data: null,
+  });
+});
 
 const { MONGODB_USERNAME, MONGODB_PASSWORD, MONGODB_CLUSTER, MONGODB_DB_NAME } =
   process.env;
@@ -50,17 +66,3 @@ const startServer = async () => {
 };
 
 startServer();
-
-app.use(authRoutes);
-app.use(userRoutes);
-app.use(recipeRouter);
-app.use(fridgeRouter);
-
-app.use((error, req, res, next) => {
-  console.error(error);
-  const status = error.status ?? 500;
-  res.status(status).json({
-    error: error.message,
-    data: null,
-  });
-});
