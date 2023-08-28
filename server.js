@@ -50,10 +50,7 @@ app.use((error, req, res, next) => {
 const { MONGODB_USERNAME, MONGODB_PASSWORD, MONGODB_CLUSTER, MONGODB_DB_NAME } =
   process.env;
 
-//const mongoDB_URI = `mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_CLUSTER}/`;
-
-const mongoDB_URI =
-  "mongodb+srv://argandd34:elice123123%21@cluster0.ivnuzfd.mongodb.net/";
+const mongoDB_URI = `mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_CLUSTER}/`;
 
 const startServer = async () => {
   try {
