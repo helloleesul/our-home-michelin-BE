@@ -1,24 +1,36 @@
 import express from "express";
 import * as recipeController from "../controllers/recipe.js";
+import upload from "../middlewares/image.js";
+import passport from "passport";
 
 const recipeRouter = express.Router();
 
 recipeRouter.get("/api/recipes", recipeController.getAllRecipes);
 
-// 특정 레시피(레시피id) 조회
 recipeRouter.get("/api/recipes/:id", recipeController.getRecipe);
 
-// 5스타 레시피(인기 레시피) 조회
+recipeRouter.post(
+  "/api/search-ingredients-recipes",
+  passport.authenticate("jwt", { session: false }),
+  recipeController.searchIngredientsRecipes
+);
+
 recipeRouter.get("/api/fivestar-recipes", recipeController.getFiveStarRecipes);
 
-// 에디터 레시피 조회
 recipeRouter.get("/api/editors-recipes", recipeController.getEditorsRecipes);
 
 recipeRouter.post("/api/recipes", recipeController.writeRecipe);
 
-// 특정 레시피(레시피id) 수정
+recipeRouter.post(
+  "/api/recipes/upload-image",
+  upload.single("image"),
+  recipeController.uploadRecipeImage
+);
+
 recipeRouter.put("/api/recipes/:id", recipeController.updateRecipe);
 
 recipeRouter.delete("/api/recipes/:id", recipeController.deleteRecipe);
+
+recipeRouter.delete("/api/:id/image", recipeController.deleteRecipeImage);
 
 export default recipeRouter;
