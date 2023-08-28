@@ -65,17 +65,26 @@ export const getMyRecipes = async (req, res) => {
   }
 };
 
-// '나의 냉장고'에서 선택한 식재료를 포함하는 레시피 조회
+// '나의 냉장고'에서 나의 식재료를 포함하는 레시피 조회
 export const searchIngredientsRecipes = async (req, res) => {
   try {
+    const userId = req.user._id;
+    console.log(">> userId");
+    console.log(userId);
     const { ingredients } = req.body;
+    // const { selectedIngr } = req.body;
+    console.log(">> [BE] ingredients");
+    console.log(ingredients);
     const recipes = await Recipe.find({
       "ingredients.name": { $in: ingredients },
     });
+    console.log("recipes");
+    console.log(recipes);
 
     res.json(recipes);
   } catch (err) {
-    res.status(500).json({ message: "문제가 발생했습니다.", err });
+    console.error(err);
+    res.status(500).json({ message: "문제가 발생했습니다." });
   }
 };
 
