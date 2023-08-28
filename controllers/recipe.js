@@ -36,7 +36,7 @@ export const getRecipe = async (req, res) => {
     // const recipe = await Recipe.findById(recipeId);
     const recipe = await Recipe.findById(recipeId).populate(
       "writer",
-      "nickName"
+      "nickName role"
     );
     if (!recipe) {
       // 해당 레시피가 없는 경우
@@ -44,6 +44,21 @@ export const getRecipe = async (req, res) => {
     }
     res.status(200).json(recipe);
   } catch (err) {
+    res.status(500).json({ message: "문제가 발생했습니다." });
+  }
+};
+
+// '마이 페이지'에서 내가 작성한 레시피 조회
+export const getMyRecipes = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    console.log(">> userId");
+    console.log(userId);
+    const myRecipes = await Recipe.find({ writer });
+
+    res.status(200).json(myRecipes);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "문제가 발생했습니다." });
   }
 };
