@@ -6,7 +6,7 @@ dotenv.config();
 const { Strategy: JwtStrategy, ExtractJwt } = pkg;
 
 const extractJwtFromCookie = (req) => {
-  return req.cookies.token;
+  return req.signedCookies.t;
 };
 
 const options = {
