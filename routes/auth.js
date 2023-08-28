@@ -5,7 +5,11 @@ import { sendVerificationCode, verifyCode } from "../controllers/mailer.js";
 
 const router = Router();
 
-router.post("/api/login", passport.authenticate("local", { session: false }), login);
+router.post(
+  "/api/login",
+  passport.authenticate("local", { session: false }),
+  login
+);
 
 router.post("/api/request", sendVerificationCode);
 router.post("/api/verify", verifyCode);
