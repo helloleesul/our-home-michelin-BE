@@ -11,7 +11,12 @@ recipeRouter.get("/api/recipes", recipeController.getAllRecipes);
 
 recipeRouter.get("/api/recipes/:id", recipeController.getRecipe);
 
-recipeRouter.get("/api/myrecipes", verifyCookie, recipeController.getMyRecipes);
+recipeRouter.get(
+  "/api/myrecipes",
+  passport.authenticate("jwt", { session: false }),
+  verifyCookie,
+  recipeController.getMyRecipes
+);
 
 recipeRouter.post(
   "/api/search-ingredients-recipes",
