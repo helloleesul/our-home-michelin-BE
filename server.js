@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import passport from "passport";
 import dotenv from "dotenv";
 import setUpPassport from "./middlewares/passport/index.js";
+import multer from "multer";
+import upload from "./middlewares/image.js";
 
 import userRoutes from "./routes/user.js";
 import authRoutes from "./routes/auth.js";
@@ -24,6 +26,10 @@ app.use(express.urlencoded({ extended: false }));
 
 app.post("/signup", sendVerificationCode);
 app.post("/verify", verifyCode);
+app.post("/recipes/upload-image", upload.single("image"), (req, res) => {
+  const imageUrl = `http://localhost:3000/uploads/${req.file.originalname}`;
+  res.json({ imageUrl });
+});
 
 const { MONGODB_USERNAME, MONGODB_PASSWORD, MONGODB_CLUSTER, MONGODB_DB_NAME } =
   process.env;

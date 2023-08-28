@@ -33,7 +33,11 @@ export const getAllRecipes = async (req, res) => {
 export const getRecipe = async (req, res) => {
   try {
     const recipeId = req.params.id;
-    const recipe = await Recipe.findById(recipeId);
+    // const recipe = await Recipe.findById(recipeId);
+    const recipe = await Recipe.findById(recipeId).populate(
+      "writer",
+      "nickName"
+    );
     if (!recipe) {
       // 해당 레시피가 없는 경우
       return res.status(404).json({ message: "레시피를 찾을 수 없습니다 :(" });
@@ -41,6 +45,20 @@ export const getRecipe = async (req, res) => {
     res.status(200).json(recipe);
   } catch (err) {
     res.status(500).json({ message: "문제가 발생했습니다." });
+  }
+};
+
+// '나의 냉장고'에서 선택한 식재료를 포함하는 레시피 조회
+export const searchIngredientsRecipes = async (req, res) => {
+  try {
+    const { ingredients } = req.body;
+    const recipes = await Recipe.find({
+      "ingredients.name": { $in: ingredients },
+    });
+
+    res.json(recipes);
+  } catch (err) {
+    res.status(500).json({ message: "문제가 발생했습니다.", err });
   }
 };
 
@@ -129,7 +147,7 @@ export const writeRecipe = async (req, res) => {
       ingredients,
       imageUrl,
       createdDate,
-      writerId,
+      writer,
     } = req.body;
 
     const recipe = await Recipe.create({
@@ -141,13 +159,54 @@ export const writeRecipe = async (req, res) => {
       imageUrl,
       likeCount: 0,
       createdDate,
-      writerId,
+      writer,
     });
 
     res.json(recipe);
   } catch (err) {
     res.status(500).send("레시피 등록 과정에서 오류가 발생되었습니다.");
     console.log(err);
+  }
+};
+
+// 레시피 대표 이미지 업로드 처리
+export const uploadRecipeImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ message: "레시피 대표 이미지 파일을 선택해주세요." });
+    }
+
+    const imageUrl = req.file.filename;
+
+    res.json({ message: "레시피 대표 이미지 업로드 성공", imageUrl });
+  } catch (err) {
+    res.status(500).json({
+      message: "레시피 대표 이미지 업로드 과정에서 문제가 발생했습니다.",
+    });
+    console.log(err);
+  }
+};
+// 업로드한 레시피 대표 이미지 삭제 처리
+export const deleteRecipeImage = async (req, res) => {
+  try {
+    const recipeId = req.params.id;
+    const recipe = await Recipe.findById(recipeId);
+    if (!recipe) {
+      return res.status(404).json({ message: "레시피를 찾을 수 없습니다 :(" });
+    }
+
+    const imgPath = path.join(__dirname, "..", "uploads", recipe.imageUrl);
+    fs.unlinkSync(imgPath);
+
+    recipe.imageUrl = "";
+    await recipe.save();
+
+    res.satus(200).json({ message: "레시피 대표 이미지 삭제 성공" });
+  } catch (err) {
+    console.log("레시피 대표 이미지 삭제 과정에서 문제가 발생했습니다.", err);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
