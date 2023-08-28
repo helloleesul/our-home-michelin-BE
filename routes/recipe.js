@@ -2,12 +2,16 @@ import express from "express";
 import * as recipeController from "../controllers/recipe.js";
 import upload from "../middlewares/image.js";
 import passport from "passport";
+import verifyCookie from "../middlewares/verifyCookie.js";
+import recipe from "../models/recipe.js";
 
 const recipeRouter = express.Router();
 
 recipeRouter.get("/api/recipes", recipeController.getAllRecipes);
 
 recipeRouter.get("/api/recipes/:id", recipeController.getRecipe);
+
+recipeRouter.get("/api/myrecipes", verifyCookie, recipeController.getMyRecipes);
 
 recipeRouter.post(
   "/api/search-ingredients-recipes",
