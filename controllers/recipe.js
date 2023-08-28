@@ -69,6 +69,37 @@ export const getMyRecipes = async (req, res) => {
   }
 };
 
+// (테스트 필요) 마이페이지 - 나의 레시피 페이지네이션
+export const getMyRecipesWithPagination = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const defaultLimit = await Recipe.countDocuments({ writer: userId });
+
+    let offset = 0; // 시작하는 숫자
+    let limit = defaultLimit; // 끝나는 숫자
+
+    const tmpOffset = parseInt(req.query.offset);
+    if (tmpOffset >= 0) {
+      offset = tmpOffset;
+    }
+
+    const tmpLimit = parseInt(req.query.limit);
+    if (tmpLimit > 0) {
+      limit = tmpLimit;
+    }
+
+    const myRecipes = await Recipe.find({ writer: userId })
+      .sort({ createdDate: -1 })
+      .skip(offset)
+      .limit(20);
+
+    res.status(200).json(myRecipes);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "문제가 발생했습니다." });
+  }
+};
+
 // (프론트 O 백 O) '나의 냉장고'에서 나의 식재료를 포함하는 레시피 조회
 export const searchIngredientsRecipes = async (req, res) => {
   try {
