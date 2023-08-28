@@ -21,6 +21,7 @@ recipeRouter.get(
 recipeRouter.post(
   "/api/search-ingredients-recipes",
   passport.authenticate("jwt", { session: false }),
+  verifyCookie,
   recipeController.searchIngredientsRecipes
 );
 
