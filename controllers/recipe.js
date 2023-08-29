@@ -243,6 +243,7 @@ export const uploadRecipeImage = async (req, res) => {
 
     res.json({ message: "레시피 대표 이미지 업로드 성공", imageUrl });
   } catch (err) {
+    console.error(err);
     res.status(500).json({
       message: "레시피 대표 이미지 업로드 과정에서 문제가 발생했습니다.",
     });
