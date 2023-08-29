@@ -18,6 +18,13 @@ recipeRouter.get(
   recipeController.getMyRecipes
 );
 
+recipeRouter.get(
+  "/api/myrecipes/pagination",
+  passport.authenticate("jwt", { session: false }),
+  verifyCookie,
+  recipeController.getMyRecipesWithPagination
+);
+
 recipeRouter.post(
   "/api/search-ingredients-recipes",
   passport.authenticate("jwt", { session: false }),
