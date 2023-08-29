@@ -74,7 +74,7 @@ export const getMyRecipes = async (req, res) => {
 export const getMyRecipesWithPagination = async (req, res) => {
   try {
     const userId = req.user._id;
-    const currentPage = parseInt(req.query.page); // 요청한 페이지 번호
+    const currentPage = parseInt(req.query.page); // 요청한 페이지 번호 -- 버튼 인덱스!!!
     console.log(">> currentPage");
     console.log(currentPage);
     const perPage = parseInt(req.query.perPage); // 한 페이지에 표시할 레시피 수
