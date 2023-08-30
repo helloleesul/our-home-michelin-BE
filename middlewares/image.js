@@ -26,6 +26,7 @@ const upload = multer({
     filename(req, file, done) {
       const imgID = uuid4();
       const ext = path.extname(file.originalname);
+      const dir = ext.dirname;
       const imgFileName = imgID + ext;
       done(null, imgFileName);
     },
