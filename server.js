@@ -13,6 +13,7 @@ import { sendVerificationCode, verifyCode } from "./controllers/mailer.js";
 import recipeRouter from "./routes/recipe.js";
 import fridgeRouter from "./routes/fridge.js";
 import editorRouter from "./routes/editor.js";
+import likeRecipesRouter from "./routes/likeRecipes.js";
 
 dotenv.config();
 console.log(process.env.JWT_SECRET);
@@ -37,6 +38,7 @@ app.use(userRoutes);
 app.use(recipeRouter);
 app.use(fridgeRouter);
 app.use(editorRouter);
+app.use(likeRecipesRouter);
 
 app.use((error, req, res, next) => {
   console.error(error);
@@ -47,8 +49,7 @@ app.use((error, req, res, next) => {
   });
 });
 
-const { MONGODB_USERNAME, MONGODB_PASSWORD, MONGODB_CLUSTER, MONGODB_DB_NAME } =
-  process.env;
+const { MONGODB_USERNAME, MONGODB_PASSWORD, MONGODB_CLUSTER, MONGODB_DB_NAME } = process.env;
 
 const mongoDB_URI = `mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_CLUSTER}/`;
 
