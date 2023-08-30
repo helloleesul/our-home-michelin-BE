@@ -6,6 +6,7 @@ const generateToken = (user) => {
     email: user.email,
     nickName: user.name,
     role: user.role,
+    likeRecipes: user.likeRecipes,
   };
 
   const token = jwt.sign(payload, process.env.JWT_SECRET);
