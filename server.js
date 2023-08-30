@@ -48,13 +48,13 @@ app.use((error, req, res, next) => {
   });
 });
 
-//
 app.post("/upload", upload.single("uploadRecipeImg"), function (req, res) {
   res.send("이미지 multer 서버 업로드 완료");
 });
-//
+app.use("/uploads", express.static("uploads"));
 
-const { MONGODB_USERNAME, MONGODB_PASSWORD, MONGODB_CLUSTER, MONGODB_DB_NAME } = process.env;
+const { MONGODB_USERNAME, MONGODB_PASSWORD, MONGODB_CLUSTER, MONGODB_DB_NAME } =
+  process.env;
 
 const mongoDB_URI = `mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_CLUSTER}/`;
 
@@ -75,3 +75,6 @@ const startServer = async () => {
 };
 
 startServer();
+
+// FE(X): fetch(/uploads/${imagePath});
+// FE: <img src=`/uploads${imageFileName}` />

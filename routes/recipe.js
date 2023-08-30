@@ -36,9 +36,13 @@ recipeRouter.get("/api/fivestar-recipes", recipeController.getFiveStarRecipes);
 
 recipeRouter.get("/api/editors-recipes", recipeController.getEditorsRecipes);
 
-recipeRouter.post("/api/recipes", recipeController.writeRecipe);
-
-recipeRouter.post("/api/recipes/upload-image", upload.single("image"), recipeController.uploadRecipeImage);
+recipeRouter.post(
+  "/api/recipes",
+  upload.single("uploadRecipeImg"),
+  passport.authenticate("jwt", { session: false }),
+  verifyCookie,
+  recipeController.writeRecipe
+);
 
 recipeRouter.put("/api/recipes/:id", recipeController.updateRecipe);
 

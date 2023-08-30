@@ -1,6 +1,7 @@
 import Recipe from "../models/recipe.js";
 import User from "../models/user.js";
 import Editor from "../models/editor.js";
+import path from "path";
 
 // 전체 레시피 조회
 export const getAllRecipes = async (req, res) => {
@@ -33,7 +34,7 @@ export const getAllRecipes = async (req, res) => {
   }
 };
 
-// (프론트 O 백 O) 특정 레시피(recipeId) 조회
+// 특정 레시피(recipeId) 조회
 export const getRecipe = async (req, res) => {
   try {
     const recipeId = req.params.id;
@@ -52,7 +53,7 @@ export const getRecipe = async (req, res) => {
   }
 };
 
-// (프론트 O 백 O) '마이 페이지'에서 내가 작성한 레시피 조회
+// '마이 페이지'에서 내가 작성한 레시피 조회
 export const getMyRecipes = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -99,7 +100,7 @@ export const getMyRecipesWithPagination = async (req, res) => {
   }
 };
 
-// (프론트 O 백 O) '나의 냉장고'에서 나의 식재료를 포함하는 레시피 조회
+// '나의 냉장고'에서 나의 식재료를 포함하는 레시피 조회
 export const searchIngredientsRecipes = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -199,55 +200,101 @@ export const getEditorsRecipes = async (req, res) => {
 // 레시피 작성
 export const writeRecipe = async (req, res) => {
   try {
-    const {
-      title,
-      recipeType,
-      recipeServing,
-      process,
-      ingredients,
-      imageUrl,
-      createdDate,
-      writer,
-    } = req.body;
+    const { title, recipeType, recipeServing, process, ingredients, writer } =
+      req.body;
+    const newIngredients = JSON.parse(ingredients);
 
-    const recipe = await Recipe.create({
+    const imgFileData = {
+      path: req.file.path,
+      name: req.file.originalname,
+      ext: req.file.mimetype.split("/")[1],
+    };
+
+    console.log(">> BE upload imgFileData");
+    console.log(imgFileData);
+
+    const reqImageUrl = imgFileData.path;
+    console.log(">> 값 추가하고 보는 reqImageUrl");
+    console.log(reqImageUrl);
+
+    console.log(">> BE recipeWrite imageUrl");
+    console.log(reqImageUrl);
+
+    // imageUrl외 필드는 프론트 서버에서 작성되어 넘어와야한다.
+    const newRecipe = await Recipe.create({
       title,
       recipeType,
       recipeServing,
       process,
-      ingredients,
-      imageUrl,
+      ingredients: newIngredients,
+      imageUrl: reqImageUrl,
+      createdDate: new Date(),
       likeCount: 0,
-      createdDate,
       writer,
     });
 
-    res.json(recipe);
+    res.json(newRecipe);
   } catch (err) {
     res.status(500).send("레시피 등록 과정에서 오류가 발생되었습니다.");
     console.log(err);
   }
 };
 
-// (백 O) 레시피 대표 이미지 업로드 처리
-export const uploadRecipeImage = async (req, res) => {
-  try {
-    if (!req.file) {
-      return res
-        .status(400)
-        .json({ message: "레시피 대표 이미지 파일을 선택해주세요." });
-    }
+// export const uploadRecipeImage = async (req, res, next) => {
+//   try {
+//     if (!req.file) {
+//       return res
+//         .status(400)
+//         .json({ message: "레시피 대표 이미지 파일을 선택해주세요." });
+//     }
 
-    const imageUrl = req.file.filename;
+//     const imageUrl = req.file.filename;
 
-    res.json({ message: "레시피 대표 이미지 업로드 성공", imageUrl });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      message: "레시피 대표 이미지 업로드 과정에서 문제가 발생했습니다.",
-    });
-  }
-};
+//     // const { imageUrl } = req.body;
+//     console.log(">> BE upload imageUrl");
+//     console.log(imageUrl); // undefined로 나오고 있음
+
+//     const imgFileData = {
+//       path: req.file.path,
+//       name: req.file.originalname,
+//       ext: req.file.mimetype.split("/")[1],
+//       filename: imageUrl,
+//     };
+
+//     console.log(">> BE upload imgFileData");
+//     console.log(imgFileData);
+
+//     req.imgFileData = imgFileData; // req 객체에 imgFileData 추가 -> writeRecipe controller 사용을 위해 ㅠㅠ
+//     // next();
+//     res.json({ message: "이미지 업로드 성공!", imgFileData });
+//   } catch (err) {
+//     console.error(err);
+//     res
+//       .status(500)
+//       .json({ message: "이미지 업로드 과정에 문제가 발생했습니다." });
+//   }
+// };
+
+// export const uploadRecipeImage = async (req, res) => {
+//   try {
+//     if (!req.file) {
+//       return res
+//         .status(400)
+//         .json({ message: "레시피 대표 이미지 파일을 선택해주세요." });
+//     }
+
+//     const imageUrl = req.file.filename;
+
+//     res.json({ message: "레시피 대표 이미지 업로드 성공", imageUrl });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({
+//       message: "레시피 대표 이미지 업로드 과정에서 문제가 발생했습니다.",
+//     });
+//   }
+// };
+
+// 확실히 안 쓰는 걸로 정했다!!
 // 업로드한 레시피 대표 이미지 삭제 처리
 export const deleteRecipeImage = async (req, res) => {
   try {
@@ -270,12 +317,13 @@ export const deleteRecipeImage = async (req, res) => {
   }
 };
 
-// 레시피 수정 - (404 에러 - 원인 찾는 중)
+// 레시피 수정
 export const updateRecipe = async (req, res) => {
   try {
     const { title, recipeType, recipeServing, process, ingredients, imageUrl } =
       req.body;
-    const recipeId = req.params.id; // 레시피 자체의 id
+    const recipeId = req.params.id;
+
     // 존재하는 레시피인지 확인
     const existingRecipe = await Recipe.findById(recipeId);
     console.log(">> existingRecipe");
@@ -317,7 +365,7 @@ export const updateRecipe = async (req, res) => {
 // 레시피 삭제
 export const deleteRecipe = async (req, res) => {
   const recipeId = req.params.id;
-  const userId = req.user._id; // 로그인한 회원id (자신이 작성한 레시피만 삭제 가능해야해서)
+  // const userId = req.user._id; // 로그인한 회원id (자신이 작성한 레시피만 삭제 가능해야해서)
 
   try {
     const recipeToDelete = await Recipe.findById(recipeId);
@@ -326,11 +374,11 @@ export const deleteRecipe = async (req, res) => {
       return res.status(404).json({ message: "레시피를 찾을 수 없습니다 :(" });
     }
 
-    if (!recipeToDelete.writerId.equals(userId)) {
-      return res
-        .status(403)
-        .json({ message: "자신이 작성한 레시피만 삭제할 수 있습니다." });
-    }
+    // if (!recipeToDelete.writerId.equals(userId)) {
+    //   return res
+    //     .status(403)
+    //     .json({ message: "자신이 작성한 레시피만 삭제할 수 있습니다." });
+    // }
 
     const deletedRecipe = await Recipe.findByIdAndDelete(recipeId);
     return res.json({ message: "레시피 삭제가 완료되었습니다." });
