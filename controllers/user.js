@@ -15,14 +15,15 @@ export const getUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { nickName, email, password } = req.body;
+    let userUpdateData = {};
 
-    const hashedPassword = await hashPassword(password);
+    if (nickName) userUpdateData.nickName = nickName;
+    if (email) userUpdateData.email = email;
 
-    const userUpdateData = {
-      nickName,
-      email,
-      password: hashedPassword,
-    };
+    if (password) {
+      const hashedPassword = await hashPassword(password);
+      userUpdateData.password = hashedPassword;
+    }
 
     const updatedUser = await User.findByIdAndUpdate(req.user._id, userUpdateData, { new: true });
 

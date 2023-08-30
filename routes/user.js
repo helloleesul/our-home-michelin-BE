@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get("/api/myinfo", passport.authenticate("jwt", { session: false }), getUser);
 
-router.put("/api/myinfo", passport.authenticate("jwt", { session: false }), updateUser);
+router.patch("/api/myinfo", passport.authenticate("jwt", { session: false }), updateUser);
 
 router.delete("/api/myinfo", passport.authenticate("jwt", { session: false }), deleteUser);
 
