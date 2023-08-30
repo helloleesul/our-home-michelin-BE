@@ -3,8 +3,7 @@ import User from "../models/user.js";
 
 export const toggleLikeRecipes = async (req, res) => {
   const recipeId = req.body.recipeId;
-  // const userId = req.user._id;
-  const userId = req.body.id;
+  const userId = req.user._id;
 
   console.log("userId:", userId);
   console.log("req.user:", req.user);

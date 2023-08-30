@@ -11,6 +11,6 @@ router.put("/api/myinfo", passport.authenticate("jwt", { session: false }), upda
 
 router.delete("/api/myinfo", passport.authenticate("jwt", { session: false }), deleteUser);
 
-router.post("/api/confirm-password", passport.authenticate("jwt", { session: false }), verifyCookie, confirmPassword);
+router.post("/api/confirm-password", passport.authenticate("jwt", { session: false }), confirmPassword);
 
 export default router;

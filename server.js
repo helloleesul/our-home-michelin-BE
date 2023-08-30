@@ -16,7 +16,6 @@ import editorRouter from "./routes/editor.js";
 import likeRecipesRouter from "./routes/likeRecipes.js";
 
 dotenv.config();
-console.log(process.env.JWT_SECRET);
 
 const app = express();
 setUpPassport();
