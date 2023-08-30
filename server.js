@@ -55,12 +55,6 @@ app.post("/upload", upload.single("uploadRecipeImg"), function (req, res) {
 });
 //
 
-//
-app.post("/upload", upload.single("uploadRecipeImg"), function (req, res) {
-  res.send("이미지 multer 서버 업로드 완료");
-});
-//
-
 const { MONGODB_USERNAME, MONGODB_PASSWORD, MONGODB_CLUSTER, MONGODB_DB_NAME } = process.env;
 
 const mongoDB_URI = `mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_CLUSTER}/`;
