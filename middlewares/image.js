@@ -1,6 +1,14 @@
 import multer from "multer";
 import uuid4 from "uuid4";
 import path from "path";
+import fs from "fs";
+
+try {
+  fs.readdirSync("uploads");
+} catch (error) {
+  console.error("uploads 폴더가 없어 uploads 폴더를 생성합니다.");
+  fs.mkdirSync("uploads");
+}
 
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
@@ -13,7 +21,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage: multer.diskStorage({
     destination(req, file, done) {
-      done(null, "img");
+      done(null, "uploads/");
     },
     filename(req, file, done) {
       const imgID = uuid4();

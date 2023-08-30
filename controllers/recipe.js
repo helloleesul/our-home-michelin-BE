@@ -59,6 +59,7 @@ export const getMyRecipes = async (req, res) => {
     console.log(">> userId");
     console.log(userId);
     const myRecipes = await Recipe.find({ writer: userId });
+    // const defaultLimit = await Recipe.countDocuments({ writer: userId });
     console.log(">> myRecipes");
     console.log(myRecipes);
 
@@ -73,27 +74,25 @@ export const getMyRecipes = async (req, res) => {
 export const getMyRecipesWithPagination = async (req, res) => {
   try {
     const userId = req.user._id;
-    const defaultLimit = await Recipe.countDocuments({ writer: userId });
+    const currentPage = parseInt(req.query.page); // 요청한 페이지 번호 -- 버튼 인덱스!!!
+    console.log(">> currentPage");
+    console.log(currentPage);
+    const perPage = parseInt(req.query.perPage); // 한 페이지에 표시할 레시피 수
 
-    let offset = 0; // 시작하는 숫자
-    let limit = defaultLimit; // 끝나는 숫자
+    const totalRecipes = await Recipe.countDocuments({ writer: userId });
+    const totalPages = Math.ceil(totalRecipes / perPage);
 
-    const tmpOffset = parseInt(req.query.offset);
-    if (tmpOffset >= 0) {
-      offset = tmpOffset;
-    }
-
-    const tmpLimit = parseInt(req.query.limit);
-    if (tmpLimit > 0) {
-      limit = tmpLimit;
-    }
+    const offset = (currentPage - 1) * perPage; // 시작하는 숫자
 
     const myRecipes = await Recipe.find({ writer: userId })
       .sort({ createdDate: -1 })
       .skip(offset)
-      .limit(20);
+      .limit(perPage);
 
-    res.status(200).json(myRecipes);
+    res.status(200).json({
+      myRecipes,
+      totalPages,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "문제가 발생했습니다." });
@@ -243,10 +242,10 @@ export const uploadRecipeImage = async (req, res) => {
 
     res.json({ message: "레시피 대표 이미지 업로드 성공", imageUrl });
   } catch (err) {
+    console.error(err);
     res.status(500).json({
       message: "레시피 대표 이미지 업로드 과정에서 문제가 발생했습니다.",
     });
-    console.log(err);
   }
 };
 // 업로드한 레시피 대표 이미지 삭제 처리
