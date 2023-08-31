@@ -213,7 +213,7 @@ export const writeRecipe = async (req, res) => {
     const newIngredients = JSON.parse(ingredients);
     const newProcess = JSON.parse(process);
 
-    if (!req.file) {
+    if (req.file) {
       const imgFileData = {
         path: req.file.path,
         name: req.file.originalname,
@@ -230,7 +230,7 @@ export const writeRecipe = async (req, res) => {
       console.log(">> BE recipeWrite imageUrl");
       console.log(reqImageUrl);
     } else {
-      reqImageUrl = imageUrl;
+      reqImageUrl = "";
     }
 
     // imageUrl외 필드는 프론트 서버에서 작성되어 넘어와야한다.
@@ -307,29 +307,7 @@ export const writeRecipe = async (req, res) => {
 //   }
 // };
 
-// 확실히 안 쓰는 걸로 정했다!!
-// 업로드한 레시피 대표 이미지 삭제 처리
-export const deleteRecipeImage = async (req, res) => {
-  try {
-    const recipeId = req.params.id;
-    const recipe = await Recipe.findById(recipeId);
-    if (!recipe) {
-      return res.status(404).json({ message: "레시피를 찾을 수 없습니다 :(" });
-    }
-
-    const imgPath = path.join(__dirname, "..", "uploads", recipe.imageUrl);
-    fs.unlinkSync(imgPath);
-
-    recipe.imageUrl = "";
-    await recipe.save();
-
-    res.satus(200).json({ message: "레시피 대표 이미지 삭제 성공" });
-  } catch (err) {
-    console.log("레시피 대표 이미지 삭제 과정에서 문제가 발생했습니다.", err);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-};
-
+//
 // 레시피 수정
 export const updateRecipe = async (req, res) => {
   try {
@@ -339,36 +317,29 @@ export const updateRecipe = async (req, res) => {
 
     // 존재하는 레시피인지 확인
     const existingRecipe = await Recipe.findById(recipeId);
-    console.log(">> existingRecipe");
-    console.log(existingRecipe);
 
     if (!existingRecipe) {
       return res.status(404).json({ message: "레시피를 찾을 수 없습니다." });
     }
 
-    // 레시피 작성자 id인지 레시피 수정 권한 확인
-    if (existingRecipe.writer.toString() !== req.user._id) {
-      return res
-        .status(403)
-        .json({ message: "해당 레시피에 대한 수정 권한이 없습니다." });
+    let reqImageUrl = "";
+    if (req.file) {
+      const imgFileData = {
+        path: req.file.path,
+        name: req.file.originalname,
+        ext: req.file.mimetype.split("/")[1],
+      };
+      reqImageUrl = imgFileData.path;
     }
 
-    const imgFileData = {
-      path: req.file.path,
-      name: req.file.originalname,
-      ext: req.file.mimetype.split("/")[1],
-    };
-
-    const reqImageUrl = imgFileData.path;
-
-    const recipeUpdateData = await Recipe.findByIdAndUpdate(recipeId, {
-      title,
-      recipeType,
-      recipeServing,
-      process,
-      ingredients,
+    const recipeUpdateData = {
+      title: req.body.title,
+      recipeType: req.body.recipeType,
+      recipeServing: req.body.recipeServing,
+      process: JSON.parse(req.body.process),
+      ingredients: JSON.parse(req.body.ingredients),
       imageUrl: reqImageUrl,
-    });
+    };
 
     const updatedRecipe = await Recipe.findByIdAndUpdate(
       recipeId,
@@ -376,7 +347,7 @@ export const updateRecipe = async (req, res) => {
       { new: true }
     );
 
-    res.status(200).json({ recipe: updatedRecipe });
+    res.status(200).json(updatedRecipe);
   } catch (err) {
     console.error(err);
     res.status(500).send("레시피 수정 과정에서 오류가 발생되었습니다.");
