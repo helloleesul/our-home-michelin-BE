@@ -44,7 +44,13 @@ recipeRouter.post(
   recipeController.writeRecipe
 );
 
-recipeRouter.put("/api/recipes/:id", recipeController.updateRecipe);
+recipeRouter.patch(
+  "/api/recipes/:id",
+  upload.single("uploadRecipeImg"),
+  passport.authenticate("jwt", { session: false }),
+  verifyCookie,
+  recipeController.updateRecipe
+);
 
 recipeRouter.delete("/api/recipes/:id", recipeController.deleteRecipe);
 
