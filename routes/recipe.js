@@ -54,6 +54,4 @@ recipeRouter.patch(
 
 recipeRouter.delete("/api/recipes/:id", recipeController.deleteRecipe);
 
-recipeRouter.delete("/api/:id/image", recipeController.deleteRecipeImage);
-
 export default recipeRouter;
