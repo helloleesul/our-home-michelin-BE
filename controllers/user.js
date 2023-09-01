@@ -15,6 +15,22 @@ export const getUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { nickName, email, password } = req.body;
+    // const userId = req.user._id;
+    // console.log(">> userId");
+    // console.log(userId);
+
+    // let profileImageURL = "";
+    let profileImageURL = req.user.profileImageURL;
+    if (req.file) {
+      const imgFileData = {
+        path: req.file.path,
+        name: req.file.originalname,
+        ext: req.file.mimetype.split("/")[1],
+      };
+
+      profileImageURL = imgFileData.path;
+    }
+
     let userUpdateData = {};
 
     if (nickName) userUpdateData.nickName = nickName;
@@ -25,7 +41,11 @@ export const updateUser = async (req, res) => {
       userUpdateData.password = hashedPassword;
     }
 
-    const updatedUser = await User.findByIdAndUpdate(req.user._id, userUpdateData, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { ...userUpdateData, profileImageURL },
+      { new: true }
+    );
 
     if (!updatedUser) throw Error("존재하지 않는 회원입니다.");
 
