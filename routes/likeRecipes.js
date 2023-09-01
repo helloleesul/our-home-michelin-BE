@@ -4,6 +4,10 @@ import passport from "passport";
 
 const router = express.Router();
 
-router.post("/api/toggleLikeRecipes", passport.authenticate("jwt", { session: false }), toggleLikeRecipes);
+router.post(
+  "/api/toggleLikeRecipes",
+  passport.authenticate("jwt", { session: false }),
+  toggleLikeRecipes
+);
 
 export default router;

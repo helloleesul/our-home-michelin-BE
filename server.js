@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 import passport from "passport";
 import dotenv from "dotenv";
 import setUpPassport from "./middlewares/passport/index.js";
-import multer from "multer";
 import upload from "./middlewares/image.js";
 
 import userRoutes from "./routes/user.js";
@@ -75,6 +74,3 @@ const startServer = async () => {
 };
 
 startServer();
-
-// FE(X): fetch(/uploads/${imagePath});
-// FE: <img src=`/uploads${imageFileName}` />

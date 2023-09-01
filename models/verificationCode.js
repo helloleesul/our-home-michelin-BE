@@ -20,6 +20,9 @@ const VerificationCodeSchema = new mongoose.Schema({
   },
 });
 
-const VerificationCode = mongoose.model("VerificationCode", VerificationCodeSchema);
+const VerificationCode = mongoose.model(
+  "VerificationCode",
+  VerificationCodeSchema
+);
 
 export default VerificationCode;

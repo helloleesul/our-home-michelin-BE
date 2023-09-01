@@ -5,12 +5,8 @@ export const toggleLikeRecipes = async (req, res) => {
   const recipeId = req.body.recipeId;
   const userId = req.user._id;
 
-  console.log("userId:", userId);
-  console.log("recipeId:", recipeId);
-
   try {
     const user = await User.findById(userId);
-    console.log(user);
 
     let likeCountChange = 1;
     let updateAction;
@@ -23,8 +19,10 @@ export const toggleLikeRecipes = async (req, res) => {
     }
 
     await User.updateOne({ _id: userId }, updateAction);
-    await Recipe.updateOne({ _id: recipeId }, { $inc: { likeCount: likeCountChange } });
-    console.log("레시피 업데이트 성공");
+    await Recipe.updateOne(
+      { _id: recipeId },
+      { $inc: { likeCount: likeCountChange } }
+    );
 
     const userLikedRecipes = await User.aggregate([
       { $match: { _id: userId } },
@@ -40,7 +38,6 @@ export const toggleLikeRecipes = async (req, res) => {
     ]);
     res.status(200).json({ success: true, userLikedRecipes });
   } catch (error) {
-    console.log("에러발생", error);
     res.status(400).json({ success: false, error });
   }
 };

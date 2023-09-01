@@ -6,7 +6,6 @@ import VerificationCode from "../models/VerificationCode.js";
 
 export const login = (req, res, next) => {
   try {
-    console.log(req.user);
     const token = generateToken(req.user);
     res
       .cookie("t", token, {
