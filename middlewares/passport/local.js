@@ -21,6 +21,7 @@ const local = new LocalStrategy(config, async (email, password, done) => {
       _id: user._id,
       email: user.email,
       nickName: user.nickName,
+      password: user.password,
       role: user.role,
       likeRecipes: user.likeRecipes,
     });
