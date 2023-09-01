@@ -38,6 +38,6 @@ export const toggleLikeRecipes = async (req, res) => {
     ]);
     res.status(200).json({ success: true, userLikedRecipes });
   } catch (error) {
-    res.status(400).json({ success: false, error });
+    next(error);
   }
 };
