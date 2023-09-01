@@ -1,15 +1,14 @@
 import Recipe from "../models/recipe.js";
 import User from "../models/user.js";
 import Editor from "../models/editor.js";
-import path from "path";
 
 // 전체 레시피 조회
 export const getAllRecipes = async (req, res) => {
   try {
-    const defaultLimit = await Recipe.countDocuments(); // defaultLimit - 전체 레시피 수
+    const defaultLimit = await Recipe.countDocuments();
 
-    let offset = 0; // offset: 시작하는 숫자
-    let limit = defaultLimit; // limit: 끝나는 숫자
+    let offset = 0;
+    let limit = defaultLimit;
 
     const tmpOffset = parseInt(req.query.offset);
     if (tmpOffset >= 0) {
@@ -44,7 +43,6 @@ export const getRecipe = async (req, res) => {
       "nickName role profileImageURL"
     );
     if (!recipe) {
-      // 해당 레시피가 없는 경우
       return res.status(404).json({ message: "레시피를 찾을 수 없습니다 :(" });
     }
     res.status(200).json(recipe);
@@ -71,19 +69,19 @@ export const getMyRecipes = async (req, res) => {
   }
 };
 
-// (테스트 필요) 마이페이지 - 나의 레시피 페이지네이션
+// 마이페이지 - 나의 레시피 페이지네이션
 export const getMyRecipesWithPagination = async (req, res) => {
   try {
     const userId = req.user._id;
-    const currentPage = parseInt(req.query.page); // 요청한 페이지 번호 -- 버튼 인덱스!!!
+    const currentPage = parseInt(req.query.page); // 요청한 페이지 번호 -- 버튼 인덱스
     console.log(">> currentPage");
     console.log(currentPage);
-    const perPage = parseInt(req.query.perPage); // 한 페이지에 표시할 레시피 수
+    const perPage = parseInt(req.query.perPage);
 
     const totalRecipes = await Recipe.countDocuments({ writer: userId });
     const totalPages = Math.ceil(totalRecipes / perPage);
 
-    const offset = (currentPage - 1) * perPage; // 시작하는 숫자
+    const offset = (currentPage - 1) * perPage;
 
     const myRecipes = await Recipe.find({ writer: userId })
       .sort({ createdDate: -1 })
@@ -104,17 +102,10 @@ export const getMyRecipesWithPagination = async (req, res) => {
 export const searchIngredientsRecipes = async (req, res) => {
   try {
     const userId = req.user._id;
-    console.log(">> userId");
-    console.log(userId);
     const { ingredients } = req.body;
-    // const { selectedIngr } = req.body;
-    console.log(">> [BE] ingredients");
-    console.log(ingredients);
     const recipes = await Recipe.find({
       "ingredients.name": { $in: ingredients },
     });
-    console.log("recipes");
-    console.log(recipes);
 
     res.json(recipes);
   } catch (err) {
@@ -123,7 +114,7 @@ export const searchIngredientsRecipes = async (req, res) => {
   }
 };
 
-// (백 O) 5스타 레시피(=인기 레시피) 조회
+// 5스타 레시피(=인기 레시피) 조회
 export const getFiveStarRecipes = async (req, res) => {
   try {
     const defaultLimit = await Recipe.countDocuments({
@@ -163,7 +154,7 @@ export const getFiveStarRecipes = async (req, res) => {
   }
 };
 
-// (백 O) 에디터 목록 & 에디터의 레시피 목록 조회
+// 에디터 목록 & 에디터의 레시피 목록 조회
 export const getEditorsRecipes = async (req, res) => {
   try {
     // 좋아요 100개 이상(= 에디터 자격) 받은 레시피가 있는 에디터 조회
@@ -220,15 +211,7 @@ export const writeRecipe = async (req, res) => {
         ext: req.file.mimetype.split("/")[1],
       };
 
-      console.log(">> BE upload imgFileData");
-      console.log(imgFileData);
-
       reqImageUrl = imgFileData.path;
-      console.log(">> 값 추가하고 보는 reqImageUrl");
-      console.log(reqImageUrl);
-
-      console.log(">> BE recipeWrite imageUrl");
-      console.log(reqImageUrl);
     } else {
       reqImageUrl = "";
     }
@@ -253,61 +236,6 @@ export const writeRecipe = async (req, res) => {
   }
 };
 
-// export const uploadRecipeImage = async (req, res, next) => {
-//   try {
-//     if (!req.file) {
-//       return res
-//         .status(400)
-//         .json({ message: "레시피 대표 이미지 파일을 선택해주세요." });
-//     }
-
-//     const imageUrl = req.file.filename;
-
-//     // const { imageUrl } = req.body;
-//     console.log(">> BE upload imageUrl");
-//     console.log(imageUrl); // undefined로 나오고 있음
-
-//     const imgFileData = {
-//       path: req.file.path,
-//       name: req.file.originalname,
-//       ext: req.file.mimetype.split("/")[1],
-//       filename: imageUrl,
-//     };
-
-//     console.log(">> BE upload imgFileData");
-//     console.log(imgFileData);
-
-//     req.imgFileData = imgFileData; // req 객체에 imgFileData 추가 -> writeRecipe controller 사용을 위해 ㅠㅠ
-//     // next();
-//     res.json({ message: "이미지 업로드 성공!", imgFileData });
-//   } catch (err) {
-//     console.error(err);
-//     res
-//       .status(500)
-//       .json({ message: "이미지 업로드 과정에 문제가 발생했습니다." });
-//   }
-// };
-
-// export const uploadRecipeImage = async (req, res) => {
-//   try {
-//     if (!req.file) {
-//       return res
-//         .status(400)
-//         .json({ message: "레시피 대표 이미지 파일을 선택해주세요." });
-//     }
-
-//     const imageUrl = req.file.filename;
-
-//     res.json({ message: "레시피 대표 이미지 업로드 성공", imageUrl });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({
-//       message: "레시피 대표 이미지 업로드 과정에서 문제가 발생했습니다.",
-//     });
-//   }
-// };
-
-//
 // 레시피 수정
 export const updateRecipe = async (req, res) => {
   try {
@@ -315,7 +243,6 @@ export const updateRecipe = async (req, res) => {
       req.body;
     const recipeId = req.params.id;
 
-    // 존재하는 레시피인지 확인
     const existingRecipe = await Recipe.findById(recipeId);
 
     if (!existingRecipe) {
@@ -357,7 +284,6 @@ export const updateRecipe = async (req, res) => {
 // 레시피 삭제
 export const deleteRecipe = async (req, res) => {
   const recipeId = req.params.id;
-  // const userId = req.user._id; // 로그인한 회원id (자신이 작성한 레시피만 삭제 가능해야해서)
 
   try {
     const recipeToDelete = await Recipe.findById(recipeId);
@@ -365,12 +291,6 @@ export const deleteRecipe = async (req, res) => {
     if (!recipeToDelete) {
       return res.status(404).json({ message: "레시피를 찾을 수 없습니다 :(" });
     }
-
-    // if (!recipeToDelete.writerId.equals(userId)) {
-    //   return res
-    //     .status(403)
-    //     .json({ message: "자신이 작성한 레시피만 삭제할 수 있습니다." });
-    // }
 
     const deletedRecipe = await Recipe.findByIdAndDelete(recipeId);
     return res.json({ message: "레시피 삭제가 완료되었습니다." });
