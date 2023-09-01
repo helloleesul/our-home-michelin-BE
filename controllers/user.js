@@ -55,16 +55,16 @@ export const updateUser = async (req, res) => {
 export const deleteUser = async (req, res, next) => {
   try {
     console.log(req);
-    // const user = await User.findById(req.user._id);
-    // console.log(user);
+    const user = await User.findById(req.user._id);
+    console.log(user);
 
-    // if (!user) throw Error("존재하지 않는 회원입니다.");
+    if (!user) throw Error("존재하지 않는 회원입니다.");
 
-    // const isMatch = await bcrypt.compare(req.body.password, user.password);
+    const isMatch = await bcrypt.compare(req.body.password, user.password);
 
-    // if (!isMatch) {
-    //   return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." });
-    // }
+    if (!isMatch) {
+      return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." });
+    }
     await User.findByIdAndDelete(req.user._id);
 
     res.json({ message: "회원탈퇴가 완료되었습니다." });
