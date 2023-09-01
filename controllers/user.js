@@ -24,7 +24,7 @@ export const updateUser = async (req, res) => {
         ext: req.file.mimetype.split("/")[1],
       };
 
-      profileImageURL = "/" + imgFileData.path;
+      profileImageURL = `/${imgFileData.path}`;
     }
 
     let userUpdateData = {};

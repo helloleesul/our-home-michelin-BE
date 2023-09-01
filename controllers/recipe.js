@@ -211,7 +211,7 @@ export const writeRecipe = async (req, res) => {
         ext: req.file.mimetype.split("/")[1],
       };
 
-      reqImageUrl = "/" + imgFileData.path;
+      reqImageUrl = `/${imgFileData.path}`;
     } else {
       reqImageUrl = "";
     }
@@ -256,7 +256,7 @@ export const updateRecipe = async (req, res) => {
         name: req.file.originalname,
         ext: req.file.mimetype.split("/")[1],
       };
-      reqImageUrl = "/" + imgFileData.path;
+      reqImageUrl = `/${imgFileData.path}`;
     }
 
     const recipeUpdateData = {
