@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import crypto from "crypto";
-//import VerificationCode from "../models/VerificationCode.js";
+import VerificationCode from "../models/VerificationCode.js";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -10,29 +10,31 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const userVerificationStatus = new Map();
-
-const userVerificationCodes = new Map();
-
 export const sendVerificationCode = async (req, res, next) => {
   const { email } = req.body;
-
   const verificationCode = crypto.randomBytes(4).toString("hex");
   const expiryTime = Date.now() + 3 * 60 * 1000;
-  userVerificationCodes.set(email, {
-    code: verificationCode,
-    expiryTime: expiryTime,
-    attempts: 0,
-  });
-  console.log("Current userVerificationCodes:", userVerificationCodes);
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "안녕하세요 5스타 회원가입 인증번호 입니다.",
-    text: `당신의 인증번호는 ${verificationCode} 입니다.`,
-  };
 
   try {
+    await VerificationCode.findOneAndUpdate(
+      { email },
+      {
+        $set: {
+          code: verificationCode,
+          expiryTime,
+          attempts: 0,
+        },
+      },
+      { upsert: true }
+    );
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "안녕하세요 5스타 회원가입 인증번호 입니다.",
+      text: `당신의 인증번호는 ${verificationCode} 입니다.`,
+    };
+
     await transporter.sendMail(mailOptions);
     res.send("인증 코드를 보냈습니다!");
   } catch (error) {
@@ -41,43 +43,32 @@ export const sendVerificationCode = async (req, res, next) => {
   }
 };
 
-export const verifyCode = (req, res, next) => {
-  console.log("Stored Code:", req.body);
+export const verifyCode = async (req, res, next) => {
   const { email, code } = req.body;
 
-  const storedData = userVerificationCodes.get(email);
+  try {
+    const storedData = await VerificationCode.findOne({ email });
 
-  if (!storedData) {
-    const error = new Error("유효하지 않은 코드입니다.");
-    error.status = 400;
-    return next(error);
-  }
+    if (!storedData) {
+      const error = new Error("유효하지 않은 코드입니다.");
+      error.status = 400;
+      return next(error);
+    }
 
-  storedData.attempts += 1;
+    if (storedData.expiryTime < Date.now()) {
+      const error = new Error("인증코드가 만료되었습니다.");
+      error.status = 400;
+      return next(error);
+    }
 
-  if (storedData.attempts > 3) {
-    userVerificationCodes.delete(email);
-    const error = new Error("최대 시도 횟수를 초과했습니다.");
-    error.status = 400;
-    return next(error);
-  }
-
-  if (storedData.expiryTime < Date.now()) {
-    userVerificationCodes.delete(email);
-    const error = new Error("인증코드가 만료되었습니다.");
-    error.status = 400;
-    return next(error);
-  }
-
-  if (storedData.code === code) {
-    userVerificationCodes.delete(email);
-
-    userVerificationStatus.set(email, true);
-    console.log(`Email ${email} verified!`);
-    res.status(200).json({ message: "인증 성공!" });
-  } else {
-    const error = new Error("유효하지 않은 코드입니다.");
-    error.status = 400;
+    if (storedData.code === code) {
+      res.status(200).json({ message: "인증 성공!" });
+    } else {
+      const error = new Error("유효하지 않은 코드입니다.");
+      error.status = 400;
+      next(error);
+    }
+  } catch (error) {
     next(error);
   }
 };

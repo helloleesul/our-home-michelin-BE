@@ -2,7 +2,7 @@ import User from "../models/user.js";
 import hashPassword from "../utils/hashpassword.js";
 import generateToken from "../utils/token.js";
 import passport from "passport";
-import { userVerificationStatus } from "../controllers/mailer.js";
+import VerificationCode from "../models/VerificationCode.js";
 
 export const login = (req, res, next) => {
   try {
@@ -24,7 +24,9 @@ export const join = async (req, res, next) => {
   try {
     const { email, nickName, password } = req.body;
 
-    if (!userVerificationStatus.get(email)) {
+    const storedData = await VerificationCode.findOne({ email });
+
+    if (!storedData) {
       const error = new Error("이메일 인증이 필요합니다.");
       error.status = 400;
       throw error;

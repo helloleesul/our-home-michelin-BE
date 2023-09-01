@@ -4,7 +4,6 @@ const VerificationCodeSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
   },
   code: {
     type: String,
@@ -21,9 +20,6 @@ const VerificationCodeSchema = new mongoose.Schema({
   },
 });
 
-const VerificationCode = mongoose.model(
-  "VerificationCode",
-  VerificationCodeSchema
-);
+const VerificationCode = mongoose.model("VerificationCode", VerificationCodeSchema);
 
 export default VerificationCode;
