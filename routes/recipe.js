@@ -34,8 +34,6 @@ recipeRouter.post(
 
 recipeRouter.get("/api/fivestar-recipes", recipeController.getFiveStarRecipes);
 
-recipeRouter.get("/api/editors-recipes", recipeController.getEditorsRecipes);
-
 recipeRouter.post(
   "/api/recipes",
   upload.single("uploadRecipeImg"),
