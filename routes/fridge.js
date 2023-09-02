@@ -5,7 +5,6 @@ import {
   updateBestBefore,
   deleteIngredient,
 } from "../controllers/fridge.js";
-import verifyCookie from "../middlewares/verifyCookie.js";
 import passport from "passport";
 
 const router = express.Router();

@@ -5,7 +5,6 @@ import {
   deleteUser,
   confirmPassword,
 } from "../controllers/user.js";
-import verifyCookie from "../middlewares/verifyCookie.js";
 import passport from "passport";
 import upload from "../middlewares/image.js";
 
