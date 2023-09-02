@@ -2,7 +2,6 @@ import Recipe from "../models/recipe.js";
 import User from "../models/user.js";
 import Editor from "../models/editor.js";
 
-// 전체 레시피 조회
 export const getAllRecipes = async (req, res) => {
   try {
     const defaultLimit = await Recipe.countDocuments();
@@ -25,19 +24,15 @@ export const getAllRecipes = async (req, res) => {
       .skip(offset)
       .limit(limit);
 
-    console.log(">> getAllRecipes");
-    console.log(recipes);
     res.status(200).json(recipes);
   } catch (err) {
     res.status(500).json({ message: "문제가 발생했습니다. " });
   }
 };
 
-// 특정 레시피(recipeId) 조회
 export const getRecipe = async (req, res) => {
   try {
     const recipeId = req.params.id;
-    // const recipe = await Recipe.findById(recipeId);
     const recipe = await Recipe.findById(recipeId).populate(
       "writer",
       "nickName role profileImageURL"
@@ -51,16 +46,10 @@ export const getRecipe = async (req, res) => {
   }
 };
 
-// '마이 페이지'에서 내가 작성한 레시피 조회
 export const getMyRecipes = async (req, res) => {
   try {
     const userId = req.user._id;
-    console.log(">> userId");
-    console.log(userId);
     const myRecipes = await Recipe.find({ writer: userId });
-    // const defaultLimit = await Recipe.countDocuments({ writer: userId });
-    console.log(">> myRecipes");
-    console.log(myRecipes);
 
     res.status(200).json(myRecipes);
   } catch (err) {
@@ -69,13 +58,10 @@ export const getMyRecipes = async (req, res) => {
   }
 };
 
-// 마이페이지 - 나의 레시피 페이지네이션
 export const getMyRecipesWithPagination = async (req, res) => {
   try {
     const userId = req.user._id;
-    const currentPage = parseInt(req.query.page); // 요청한 페이지 번호 -- 버튼 인덱스
-    console.log(">> currentPage");
-    console.log(currentPage);
+    const currentPage = parseInt(req.query.page);
     const perPage = parseInt(req.query.perPage);
 
     const totalRecipes = await Recipe.countDocuments({ writer: userId });
@@ -98,7 +84,6 @@ export const getMyRecipesWithPagination = async (req, res) => {
   }
 };
 
-// '나의 냉장고'에서 나의 식재료를 포함하는 레시피 조회
 export const searchIngredientsRecipes = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -114,7 +99,6 @@ export const searchIngredientsRecipes = async (req, res) => {
   }
 };
 
-// 5스타 레시피(=인기 레시피) 조회
 export const getFiveStarRecipes = async (req, res) => {
   try {
     const defaultLimit = await Recipe.countDocuments({
@@ -154,41 +138,6 @@ export const getFiveStarRecipes = async (req, res) => {
   }
 };
 
-// 에디터 목록 & 에디터의 레시피 목록 조회
-export const getEditorsRecipes = async (req, res) => {
-  try {
-    // 좋아요 100개 이상(= 에디터 자격) 받은 레시피가 있는 에디터 조회
-    const editors2022 = await Editor.find({
-      rank2022: { $gte: 1, $lte: 10 },
-    })
-      .sort({ rank2022: 1 })
-      .limit(10);
-    const editors2023 = await Editor.find({
-      rank2023: { $gte: 1, $lte: 10 },
-    })
-      .sort({ rank2022: 1 })
-      .limit(10);
-
-    const editorsWithRecipes = [];
-
-    // 각 에디터의 레시피 목록 조회
-    for (const editor of [...editors2022, ...editors2023]) {
-      const editorId = editor.userId;
-      const recipes = await Recipe.find({ writerId: editorId });
-      editorsWithRecipes.push({ editor, recipes });
-    }
-
-    res.status(200).json({
-      message: "에디터, 에디터가 작성한 레시피 목록 조회 성공",
-      editorsWithRecipes,
-    });
-  } catch (err) {
-    res.status(500).json({ message: "문제가 발생했습니다." });
-    console.log(err);
-  }
-};
-
-// 레시피 작성
 export const writeRecipe = async (req, res) => {
   try {
     let reqImageUrl;
@@ -216,7 +165,6 @@ export const writeRecipe = async (req, res) => {
       reqImageUrl = "";
     }
 
-    // imageUrl외 필드는 프론트 서버에서 작성되어 넘어와야한다.
     const newRecipe = await Recipe.create({
       title,
       recipeType,
@@ -236,7 +184,6 @@ export const writeRecipe = async (req, res) => {
   }
 };
 
-// 레시피 수정
 export const updateRecipe = async (req, res) => {
   try {
     const { title, recipeType, recipeServing, process, ingredients, imageUrl } =
@@ -281,7 +228,6 @@ export const updateRecipe = async (req, res) => {
   }
 };
 
-// 레시피 삭제
 export const deleteRecipe = async (req, res) => {
   const recipeId = req.params.id;
 
