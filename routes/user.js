@@ -1,16 +1,38 @@
 import express from "express";
-import { getUser, updateUser, deleteUser, confirmPassword } from "../controllers/user.js";
-import verifyCookie from "../middlewares/verifyCookie.js";
+import {
+  getUser,
+  updateUser,
+  deleteUser,
+  confirmPassword,
+} from "../controllers/user.js";
 import passport from "passport";
+import upload from "../middlewares/image.js";
 
 const router = express.Router();
 
-router.get("/api/myinfo", passport.authenticate("jwt", { session: false }), verifyCookie, getUser);
+router.get(
+  "/api/myinfo",
+  passport.authenticate("jwt", { session: false }),
+  getUser
+);
 
-router.put("/api/myinfo", passport.authenticate("jwt", { session: false }), verifyCookie, updateUser);
+router.patch(
+  "/api/myinfo",
+  passport.authenticate("jwt", { session: false }),
+  upload.single("profileImage"),
+  updateUser
+);
 
-router.delete("/api/myinfo", passport.authenticate("jwt", { session: false }), verifyCookie, deleteUser);
+router.delete(
+  "/api/myinfo",
+  passport.authenticate("jwt", { session: false }),
+  deleteUser
+);
 
-router.post("/api/confirm-password", passport.authenticate("jwt", { session: false }), verifyCookie, confirmPassword);
+router.post(
+  "/api/confirm-password",
+  passport.authenticate("jwt", { session: false }),
+  confirmPassword
+);
 
 export default router;

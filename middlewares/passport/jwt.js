@@ -11,8 +11,6 @@ const extractJwtFromCookie = (req) => {
 
 const options = {
   secretOrKey: process.env.JWT_SECRET,
-  //다른방식으로도 가능한 틀.
-  //ex)ExtractJwt.fromAuthHeaderAsBearerToken()
   jwtFromRequest: ExtractJwt.fromExtractors([extractJwtFromCookie]),
 };
 
