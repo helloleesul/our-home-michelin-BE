@@ -17,6 +17,8 @@ import likeRecipesRouter from "./routes/likeRecipes.js";
 dotenv.config();
 
 const app = express();
+const port = process.env.PORT || 3001;
+
 setUpPassport();
 app.use(cookieParser(process.env.JWT_SECRET));
 
@@ -52,20 +54,15 @@ app.post("/upload", upload.single("uploadRecipeImg"), function (req, res) {
 });
 app.use("/uploads", express.static("uploads"));
 
-const { MONGODB_USERNAME, MONGODB_PASSWORD, MONGODB_CLUSTER, MONGODB_DB_NAME } =
-  process.env;
-
-const mongoDB_URI = `mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_CLUSTER}/`;
-
 const startServer = async () => {
   try {
-    await mongoose.connect(mongoDB_URI, {
+    await mongoose.connect(process.env.MONGODB, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
     console.log("DB 접속 성공");
 
-    app.listen(3001, () => {
+    app.listen(port, () => {
       console.log("3001포트에서 서버가 작동중");
     });
   } catch (error) {
