@@ -17,7 +17,7 @@ import likeRecipesRouter from "./routes/likeRecipes.js";
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 
 setUpPassport();
 app.use(cookieParser(process.env.JWT_SECRET));
@@ -63,7 +63,7 @@ const startServer = async () => {
     console.log("DB 접속 성공");
 
     app.listen(port, () => {
-      console.log("3001포트에서 서버가 작동중");
+      console.log(`${port} 서버가 작동중`);
     });
   } catch (error) {
     console.error("DB 접속 실패", error);
