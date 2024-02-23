@@ -3,7 +3,9 @@ import crypto from "crypto";
 import VerificationCode from "../models/VerificationCode.js";
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  service: "naver",
+  host: "smtp.naver.com",
+  port: 587,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD,
@@ -31,7 +33,7 @@ export const sendVerificationCode = async (req, res, next) => {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
-      subject: "안녕하세요 5스타 회원가입 인증번호 입니다.",
+      subject: "안녕하세요 우리집 냉슐랭 회원가입 인증번호입니다.",
       text: `당신의 인증번호는 ${verificationCode} 입니다.`,
     };
 
