@@ -2,7 +2,7 @@ import User from "../models/user.js";
 import hashPassword from "../utils/hashpassword.js";
 import generateToken from "../utils/token.js";
 import passport from "passport";
-import VerificationCode from "../models/VerificationCode.js";
+import VerificationCode from "../models/verificationCode.js";
 
 export const login = (req, res, next) => {
   try {
