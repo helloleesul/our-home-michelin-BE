@@ -28,10 +28,10 @@ app.use(express.urlencoded({ extended: false }));
 
 app.post("/signup", sendVerificationCode);
 app.post("/verify", verifyCode);
-app.post("/recipes/upload-image", upload.single("image"), (req, res) => {
-  const imageUrl = `http://localhost:3000/uploads/${req.file.originalname}`;
-  res.json({ imageUrl });
-});
+// app.post("/recipes/upload-image", upload.single("image"), (req, res) => {
+//   const imageUrl = `http://localhost:3000/uploads/${req.file.originalname}`;
+//   res.json({ imageUrl });
+// });
 
 app.use(authRoutes);
 app.use(userRoutes);
