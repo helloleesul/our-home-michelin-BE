@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import crypto from "crypto";
-import VerificationCode from "../models/VerificationCode";
+import VerificationCode from "../models/verificationCode.js";
 
 const transporter = nodemailer.createTransport({
   service: "naver",
