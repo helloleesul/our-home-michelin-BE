@@ -17,7 +17,7 @@ import likeRecipesRouter from "./routes/likeRecipes.js";
 dotenv.config();
 
 const app = express();
-// const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
 setUpPassport();
 app.use(cookieParser(process.env.JWT_SECRET));
@@ -28,10 +28,11 @@ app.use(express.urlencoded({ extended: false }));
 
 app.post("/signup", sendVerificationCode);
 app.post("/verify", verifyCode);
-// app.post("/recipes/upload-image", upload.single("image"), (req, res) => {
-//   const imageUrl = `http://localhost:3000/uploads/${req.file.originalname}`;
-//   res.json({ imageUrl });
-// });
+app.post("/recipes/upload-image", upload.single("image"), (req, res) => {
+  const host = req.get("host");
+  const imageUrl = `${req.protocol}://${host}/uploads/${req.file.originalname}`;
+  res.json({ imageUrl });
+});
 
 app.use(authRoutes);
 app.use(userRoutes);
@@ -62,8 +63,8 @@ const startServer = async () => {
     });
     console.log("DB 접속 성공");
 
-    app.listen(3000, () => {
-      console.log(`3000 서버가 작동중`);
+    app.listen(port, () => {
+      console.log(`${port} 서버가 작동중`);
     });
   } catch (error) {
     console.error("DB 접속 실패", error);
