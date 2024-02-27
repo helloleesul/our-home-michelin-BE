@@ -150,8 +150,6 @@ export const writeRecipe = async (req, res) => {
       imageUrl,
       writer,
     } = req.body;
-    const newIngredients = JSON.parse(ingredients);
-    const newProcess = JSON.parse(process);
 
     if (req.file) {
       const imgFileData = {
@@ -165,12 +163,16 @@ export const writeRecipe = async (req, res) => {
       reqImageUrl = "";
     }
 
+    const processedSteps = process.map((step) => ({
+      text: step.text,
+    }));
+
     const newRecipe = await Recipe.create({
       title,
       recipeType,
       recipeServing,
-      process: newProcess,
-      ingredients: newIngredients,
+      process: processedSteps,
+      ingredients,
       imageUrl: reqImageUrl,
       createdDate: new Date(),
       likeCount: 0,
@@ -210,8 +212,8 @@ export const updateRecipe = async (req, res) => {
       title: req.body.title,
       recipeType: req.body.recipeType,
       recipeServing: req.body.recipeServing,
-      process: JSON.parse(req.body.process),
-      ingredients: JSON.parse(req.body.ingredients),
+      process: req.body.process,
+      ingredients: req.body.ingredients,
       imageUrl: reqImageUrl,
     };
 

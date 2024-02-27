@@ -8,15 +8,19 @@ const ingredientSchema = new Schema({
   amount: { type: String, required: true },
 });
 
+const processSchema = new Schema({
+  text: { type: String, required: true },
+});
+
 const recipeSchema = new Schema({
   title: { type: String, required: true },
   recipeServing: { type: Number, required: true, default: 1 },
   recipeType: { type: String, required: true },
-  process: { type: Array, required: true },
+  process: { type: [processSchema], required: true },
   ingredients: { type: [ingredientSchema], required: true },
   imageUrl: { type: String, default: "" },
   likeCount: { type: Number, required: true },
-  writer: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  writer: { type: Schema.Types.ObjectId, ref: "User" },
   createdDate: { type: Date },
 });
 
