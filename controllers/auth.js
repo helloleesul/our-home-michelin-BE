@@ -12,7 +12,7 @@ export const login = (req, res, next) => {
         httpOnly: true,
         signed: true,
       })
-      .send({ message: "로그인 성공" });
+      .send({ message: "로그인 성공", user: req.user });
   } catch (err) {
     err.status = 500;
     next(err);
