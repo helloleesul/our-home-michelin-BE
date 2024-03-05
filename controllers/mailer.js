@@ -33,8 +33,8 @@ export const sendVerificationCode = async (req, res, next) => {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
-      subject: "안녕하세요 우리집 냉슐랭 회원가입 인증번호입니다.",
-      text: `당신의 인증번호는 ${verificationCode} 입니다.`,
+      subject: "[우리집 냉슐랭] 회원가입 인증코드",
+      text: `인증코드: ${verificationCode}`,
     };
 
     await transporter.sendMail(mailOptions);
