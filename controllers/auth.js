@@ -3,16 +3,27 @@ import hashPassword from "../utils/hashpassword.js";
 import generateToken from "../utils/token.js";
 import passport from "passport";
 import VerificationCode from "../models/verificationCode.js";
+import Fridge from "../models/fridge.js";
 
-export const login = (req, res, next) => {
+export const login = async (req, res, next) => {
   try {
     const token = generateToken(req.user);
+    let userFridge = await Fridge.findOne({ userId: req.user._id });
+
+    if (!userFridge) {
+      userFridge = { ingredients: [] };
+    }
+
     res
       .cookie("t", token, {
         httpOnly: true,
         signed: true,
       })
-      .send({ message: "로그인 성공", user: req.user });
+      .send({
+        message: "로그인 성공",
+        user: req.user,
+        fridge: userFridge.ingredients,
+      });
   } catch (err) {
     err.status = 500;
     next(err);
