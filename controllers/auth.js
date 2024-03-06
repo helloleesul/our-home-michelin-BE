@@ -9,6 +9,10 @@ export const login = async (req, res, next) => {
   try {
     const token = generateToken(req.user);
     let userFridge = await Fridge.findOne({ userId: req.user._id });
+    const { email, nickName, likeRecipes, profileImageURL } =
+      await User.findOne({
+        _id: req.user._id,
+      });
 
     if (!userFridge) {
       userFridge = { ingredients: [] };
@@ -21,7 +25,7 @@ export const login = async (req, res, next) => {
       })
       .send({
         message: "로그인 성공",
-        user: req.user,
+        user: { email, nickName, likeRecipes, profileImageURL },
         fridge: userFridge.ingredients,
       });
   } catch (err) {

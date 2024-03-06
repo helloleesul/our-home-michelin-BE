@@ -19,10 +19,6 @@ const local = new LocalStrategy(config, async (email, password, done) => {
     }
     done(null, {
       _id: user._id,
-      email: user.email,
-      nickName: user.nickName,
-      profileImageURL: user.profileImageURL,
-      likeRecipes: user.likeRecipes,
     });
   } catch (err) {
     done(err, null);
