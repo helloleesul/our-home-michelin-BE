@@ -19,7 +19,7 @@ router.get(
 router.patch(
   "/api/myinfo",
   passport.authenticate("jwt", { session: false }),
-  upload.single("profileImage"),
+  upload.single("profileImageURL"),
   updateUser
 );
 

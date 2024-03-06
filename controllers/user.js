@@ -14,9 +14,8 @@ export const getUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
   try {
-    const { nickName, email, password } = req.body;
+    let { nickName, password, profileImageURL } = req.body;
 
-    let profileImageURL = req.user.profileImageURL;
     if (req.file) {
       const imgFileData = {
         path: req.file.path,
@@ -25,13 +24,13 @@ export const updateUser = async (req, res) => {
       };
 
       profileImageURL = `/${imgFileData.path}`;
+    } else {
+      profileImageURL = "";
     }
 
     let userUpdateData = {};
 
     if (nickName) userUpdateData.nickName = nickName;
-    if (email) userUpdateData.email = email;
-
     if (password) {
       const hashedPassword = await hashPassword(password);
       userUpdateData.password = hashedPassword;
