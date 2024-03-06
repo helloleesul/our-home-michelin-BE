@@ -24,8 +24,6 @@ export const updateUser = async (req, res) => {
       };
 
       profileImageURL = `/${imgFileData.path}`;
-    } else {
-      profileImageURL = "";
     }
 
     let userUpdateData = {};
