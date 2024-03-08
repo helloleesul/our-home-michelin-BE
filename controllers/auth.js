@@ -25,7 +25,13 @@ export const login = async (req, res, next) => {
       })
       .send({
         message: "로그인 성공",
-        user: { email, nickName, likeRecipes, profileImageURL },
+        user: {
+          userId: req.user._id,
+          email,
+          nickName,
+          likeRecipes,
+          profileImageURL,
+        },
         fridge: userFridge.ingredients,
       });
   } catch (err) {
