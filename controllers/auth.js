@@ -9,10 +9,9 @@ export const login = async (req, res, next) => {
   try {
     const token = generateToken(req.user);
     let userFridge = await Fridge.findOne({ userId: req.user._id });
-    const { email, nickName, likeRecipes, profileImageURL } =
-      await User.findOne({
-        _id: req.user._id,
-      });
+    const { email, nickName, profileImageURL } = await User.findOne({
+      _id: req.user._id,
+    });
 
     if (!userFridge) {
       userFridge = { ingredients: [] };
@@ -29,7 +28,6 @@ export const login = async (req, res, next) => {
           userId: req.user._id,
           email,
           nickName,
-          likeRecipes,
           profileImageURL,
         },
         fridge: userFridge.ingredients,

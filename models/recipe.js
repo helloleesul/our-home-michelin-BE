@@ -19,7 +19,7 @@ const recipeSchema = new Schema({
   process: { type: [processSchema], required: true },
   ingredients: { type: [ingredientSchema], required: true },
   imageUrl: { type: String, default: "" },
-  likeCount: { type: Number, required: true },
+  likeUsers: { type: Array, required: true, default: [] },
   writer: { type: Schema.Types.ObjectId, ref: "User" },
   createdDate: { type: Date },
 });
