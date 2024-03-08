@@ -140,15 +140,14 @@ export const getFiveStarRecipes = async (req, res) => {
 
 export const writeRecipe = async (req, res) => {
   try {
-    let reqImageUrl;
-    const {
+    let {
       title,
       recipeType,
       recipeServing,
       process,
       ingredients,
-      imageUrl,
       writer,
+      uploadRecipeImg,
     } = req.body;
 
     if (req.file) {
@@ -158,22 +157,16 @@ export const writeRecipe = async (req, res) => {
         ext: req.file.mimetype.split("/")[1],
       };
 
-      reqImageUrl = `/${imgFileData.path}`;
-    } else {
-      reqImageUrl = "";
+      uploadRecipeImg = `/${imgFileData.path}`;
     }
-
-    const processedSteps = process.map((step) => ({
-      text: step.text,
-    }));
 
     const newRecipe = await Recipe.create({
       title,
       recipeType,
       recipeServing,
-      process: processedSteps,
-      ingredients,
-      imageUrl: reqImageUrl,
+      process: JSON.parse(process),
+      ingredients: JSON.parse(ingredients),
+      imageUrl: uploadRecipeImg,
       createdDate: new Date(),
       likeCount: 0,
       writer,
