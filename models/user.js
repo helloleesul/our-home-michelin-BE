@@ -8,7 +8,6 @@ const userSchema = new Schema({
   password: { type: String, required: true },
   role: { type: Number, required: true, default: 0 },
   profileImageURL: { type: String, required: false, default: "" },
-  likeRecipes: { type: Array, required: true, default: [] },
 });
 
 export default mongoose.model("User", userSchema);
