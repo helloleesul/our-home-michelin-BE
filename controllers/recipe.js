@@ -1,6 +1,4 @@
 import Recipe from "../models/recipe.js";
-import User from "../models/user.js";
-import Editor from "../models/editor.js";
 
 export const getAllRecipes = async (req, res) => {
   try {
@@ -24,6 +22,14 @@ export const getAllRecipes = async (req, res) => {
       .skip(offset)
       .limit(limit);
 
+    // 인기순 레시피
+    // const processedRecipes = await Recipe.aggregate([
+    //   { $match: { _id: { $in: recipes.map((recipe) => recipe._id) } } },
+    //   { $addFields: { likeUsersCount: { $size: "$likeUsers" } } },
+    //   { $sort: { likeUsersCount: -1 } },
+    // ]);
+    // console.log("🚀 ~ getMyRecipes ~ myRecipes:", processedRecipes);
+
     res.status(200).json(recipes);
   } catch (err) {
     res.status(500).json({ message: "문제가 발생했습니다. " });
@@ -46,10 +52,128 @@ export const getRecipe = async (req, res) => {
   }
 };
 
+export const writeRecipe = async (req, res) => {
+  try {
+    let {
+      title,
+      recipeType,
+      recipeServing,
+      process,
+      ingredients,
+      writer,
+      uploadRecipeImg,
+    } = req.body;
+
+    if (req.file) {
+      const imgFileData = {
+        path: req.file.path,
+        name: req.file.originalname,
+        ext: req.file.mimetype.split("/")[1],
+      };
+
+      uploadRecipeImg = `/${imgFileData.path}`;
+    }
+
+    const newRecipe = await Recipe.create({
+      title,
+      recipeType,
+      recipeServing,
+      process: JSON.parse(process),
+      ingredients: JSON.parse(ingredients),
+      imageUrl: uploadRecipeImg,
+      createdDate: new Date(),
+      likeUsers: [],
+      writer,
+    });
+
+    res.json(newRecipe);
+  } catch (err) {
+    res.status(500).send("레시피 등록 과정에서 오류가 발생되었습니다.");
+    console.log(err);
+  }
+};
+
+export const updateRecipe = async (req, res) => {
+  try {
+    const { title, recipeType, recipeServing, process, ingredients, imageUrl } =
+      req.body;
+    const recipeId = req.params.id;
+
+    const existingRecipe = await Recipe.findById(recipeId);
+
+    if (!existingRecipe) {
+      return res.status(404).json({ message: "레시피를 찾을 수 없습니다." });
+    }
+
+    let reqImageUrl = "";
+    if (req.file) {
+      const imgFileData = {
+        path: req.file.path,
+        name: req.file.originalname,
+        ext: req.file.mimetype.split("/")[1],
+      };
+      reqImageUrl = `/${imgFileData.path}`;
+    }
+
+    const recipeUpdateData = {
+      title: req.body.title,
+      recipeType: req.body.recipeType,
+      recipeServing: req.body.recipeServing,
+      process: req.body.process,
+      ingredients: req.body.ingredients,
+      imageUrl: reqImageUrl,
+    };
+
+    const updatedRecipe = await Recipe.findByIdAndUpdate(
+      recipeId,
+      recipeUpdateData,
+      { new: true }
+    );
+
+    res.status(200).json(updatedRecipe);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("레시피 수정 과정에서 오류가 발생되었습니다.");
+  }
+};
+
+export const deleteRecipe = async (req, res) => {
+  const recipeId = req.params.id;
+
+  try {
+    const recipeToDelete = await Recipe.findById(recipeId);
+
+    if (!recipeToDelete) {
+      return res.status(404).json({ message: "레시피를 찾을 수 없습니다 :(" });
+    }
+
+    const deletedRecipe = await Recipe.findByIdAndDelete(recipeId);
+    return res.json({ message: "레시피 삭제가 완료되었습니다." });
+  } catch (err) {
+    res.status(500).json({ message: "문제가 발생했습니다." });
+  }
+};
+
 export const getMyRecipes = async (req, res) => {
   try {
     const userId = req.user._id;
-    const myRecipes = await Recipe.find({ writer: userId });
+    const myRecipes = await Recipe.find({ writer: userId }).sort({
+      createdDate: -1,
+    });
+
+    res.status(200).json(myRecipes);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "문제가 발생했습니다." });
+  }
+};
+
+export const getMyBookmarkRecipes = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const myRecipes = await Recipe.find({ likeUsers: userId }).sort({
+      createdDate: -1,
+    });
 
     res.status(200).json(myRecipes);
   } catch (err) {
@@ -135,107 +259,5 @@ export const getFiveStarRecipes = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: "문제가 발생했습니다." });
     console.log(err);
-  }
-};
-
-export const writeRecipe = async (req, res) => {
-  try {
-    let {
-      title,
-      recipeType,
-      recipeServing,
-      process,
-      ingredients,
-      writer,
-      uploadRecipeImg,
-    } = req.body;
-
-    if (req.file) {
-      const imgFileData = {
-        path: req.file.path,
-        name: req.file.originalname,
-        ext: req.file.mimetype.split("/")[1],
-      };
-
-      uploadRecipeImg = `/${imgFileData.path}`;
-    }
-
-    const newRecipe = await Recipe.create({
-      title,
-      recipeType,
-      recipeServing,
-      process: JSON.parse(process),
-      ingredients: JSON.parse(ingredients),
-      imageUrl: uploadRecipeImg,
-      createdDate: new Date(),
-      likeCount: 0,
-      writer,
-    });
-
-    res.json(newRecipe);
-  } catch (err) {
-    res.status(500).send("레시피 등록 과정에서 오류가 발생되었습니다.");
-    console.log(err);
-  }
-};
-
-export const updateRecipe = async (req, res) => {
-  try {
-    const { title, recipeType, recipeServing, process, ingredients, imageUrl } =
-      req.body;
-    const recipeId = req.params.id;
-
-    const existingRecipe = await Recipe.findById(recipeId);
-
-    if (!existingRecipe) {
-      return res.status(404).json({ message: "레시피를 찾을 수 없습니다." });
-    }
-
-    let reqImageUrl = "";
-    if (req.file) {
-      const imgFileData = {
-        path: req.file.path,
-        name: req.file.originalname,
-        ext: req.file.mimetype.split("/")[1],
-      };
-      reqImageUrl = `/${imgFileData.path}`;
-    }
-
-    const recipeUpdateData = {
-      title: req.body.title,
-      recipeType: req.body.recipeType,
-      recipeServing: req.body.recipeServing,
-      process: req.body.process,
-      ingredients: req.body.ingredients,
-      imageUrl: reqImageUrl,
-    };
-
-    const updatedRecipe = await Recipe.findByIdAndUpdate(
-      recipeId,
-      recipeUpdateData,
-      { new: true }
-    );
-
-    res.status(200).json(updatedRecipe);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("레시피 수정 과정에서 오류가 발생되었습니다.");
-  }
-};
-
-export const deleteRecipe = async (req, res) => {
-  const recipeId = req.params.id;
-
-  try {
-    const recipeToDelete = await Recipe.findById(recipeId);
-
-    if (!recipeToDelete) {
-      return res.status(404).json({ message: "레시피를 찾을 수 없습니다 :(" });
-    }
-
-    const deletedRecipe = await Recipe.findByIdAndDelete(recipeId);
-    return res.json({ message: "레시피 삭제가 완료되었습니다." });
-  } catch (err) {
-    res.status(500).json({ message: "문제가 발생했습니다." });
   }
 };

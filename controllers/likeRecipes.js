@@ -7,36 +7,31 @@ export const toggleLikeRecipes = async (req, res) => {
 
   try {
     const user = await User.findById(userId);
+    const recipe = await Recipe.findById(recipeId);
 
-    let likeCountChange = 1;
-    let updateAction;
-
-    if (user.likeRecipes.includes(recipeId)) {
-      likeCountChange = -1;
-      updateAction = { $pull: { likeRecipes: recipeId } };
-    } else {
-      updateAction = { $addToSet: { likeRecipes: recipeId } };
+    if (!user || !recipe) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User or Recipe not found" });
     }
 
-    await User.updateOne({ _id: userId }, updateAction);
-    await Recipe.updateOne(
-      { _id: recipeId },
-      { $inc: { likeCount: likeCountChange } }
-    );
+    const isLiked = recipe.likeUsers.includes(userId);
 
-    const userLikedRecipes = await User.aggregate([
-      { $match: { _id: userId } },
-      { $unwind: "$likeRecipes" },
-      {
-        $lookup: {
-          from: "recipes",
-          localField: "likeRecipes",
-          foreignField: "_id",
-          as: "likedRecipesInfo",
-        },
-      },
-    ]);
-    res.status(200).json({ success: true, userLikedRecipes });
+    if (isLiked) {
+      // If already liked, remove userId from likeUsers
+      recipe.likeUsers = recipe.likeUsers.filter(
+        (id) => id.toString() !== userId.toString()
+      );
+    } else {
+      // If not liked, add userId to likeUsers
+      recipe.likeUsers.push(userId);
+    }
+
+    await recipe.save();
+
+    res
+      .status(200)
+      .json({ success: true, message: "Like toggled successfully" });
   } catch (error) {
     next(error);
   }

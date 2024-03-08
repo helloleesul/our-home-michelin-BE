@@ -19,6 +19,13 @@ recipeRouter.get(
 );
 
 recipeRouter.get(
+  "/api/my-bookmark-recipes",
+  passport.authenticate("jwt", { session: false }),
+  verifyCookie,
+  recipeController.getMyBookmarkRecipes
+);
+
+recipeRouter.get(
   "/api/myrecipes/pagination",
   passport.authenticate("jwt", { session: false }),
   verifyCookie,
