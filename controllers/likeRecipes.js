@@ -29,9 +29,14 @@ export const toggleLikeRecipes = async (req, res) => {
 
     await recipe.save();
 
-    res
-      .status(200)
-      .json({ success: true, message: "Like toggled successfully" });
+    // Fetch updated recipe information after save
+    const { likeUsers } = await Recipe.findById(recipeId);
+
+    res.status(200).json({
+      success: true,
+      message: "Like toggled successfully",
+      likeNumber: likeUsers.length,
+    });
   } catch (error) {
     next(error);
   }
