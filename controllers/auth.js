@@ -1,15 +1,14 @@
 import User from "../models/user.js";
+import Fridge from "../models/fridge.js";
+import VerificationCode from "../models/verificationCode.js";
 import hashPassword from "../utils/hashpassword.js";
 import generateToken from "../utils/token.js";
-import passport from "passport";
-import VerificationCode from "../models/verificationCode.js";
-import Fridge from "../models/fridge.js";
 
 export const login = async (req, res, next) => {
   try {
     const token = generateToken(req.user);
     let userFridge = await Fridge.findOne({ userId: req.user._id });
-    const { email, nickName, profileImageURL } = await User.findOne({
+    const { nickName } = await User.findOne({
       _id: req.user._id,
     });
 
@@ -26,9 +25,7 @@ export const login = async (req, res, next) => {
         message: "로그인 성공",
         user: {
           userId: req.user._id,
-          email,
           nickName,
-          profileImageURL,
         },
         fridge: userFridge.ingredients,
       });
@@ -69,14 +66,6 @@ export const join = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
-
-export const checkLogin = (req, res) => {
-  passport.authenticate("jwt", { session: false }, (err, user) => {
-    if (err) return res.status(500).json(err);
-    if (!user) return res.json({ isAuthenticated: false });
-    return res.json({ isAuthenticated: true, user });
-  })(req, res);
 };
 
 export const logout = (req, res) => {

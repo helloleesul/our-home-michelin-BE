@@ -81,7 +81,11 @@ export const confirmPassword = async (req, res, next) => {
       error.status = 400;
       throw error;
     }
-    res.json({ confrim: true, message: "비밀번호 확인 성공" });
+    res.json({
+      confrim: true,
+      message: "비밀번호 확인 성공",
+      user: { email: user.email, profileImageURL: user.profileImageURL },
+    });
   } catch (err) {
     next(err);
   }
