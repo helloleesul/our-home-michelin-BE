@@ -1,41 +1,40 @@
 import Recipe from "../models/recipe.js";
+import User from "../models/user.js";
 
+// 전체 레시피 조회
 export const getAllRecipes = async (req, res) => {
   try {
     const defaultLimit = await Recipe.countDocuments();
 
-    let offset = 0;
     let limit = defaultLimit;
-
-    const tmpOffset = parseInt(req.query.offset);
-    if (tmpOffset >= 0) {
-      offset = tmpOffset;
-    }
 
     const tmpLimit = parseInt(req.query.limit);
     if (limit > 0) {
       limit = tmpLimit;
     }
 
-    const recipes = await Recipe.find()
+    let recipes;
+    recipes = await Recipe.find(
+      req.query.type && { recipeType: req.query.type }
+    )
       .sort({ createdDate: -1 })
-      .skip(offset)
       .limit(limit);
 
-    // 인기순 레시피
-    // const processedRecipes = await Recipe.aggregate([
-    //   { $match: { _id: { $in: recipes.map((recipe) => recipe._id) } } },
-    //   { $addFields: { likeUsersCount: { $size: "$likeUsers" } } },
-    //   { $sort: { likeUsersCount: -1 } },
-    // ]);
-    // console.log("🚀 ~ getMyRecipes ~ myRecipes:", processedRecipes);
-
+    if (req.query.sort === "popular") {
+      recipes = await Recipe.aggregate([
+        {
+          $match: { _id: { $in: recipes.map((recipe) => recipe._id) } },
+        },
+        { $addFields: { likeUsersCount: { $size: "$likeUsers" } } },
+        { $sort: { likeUsersCount: -1 } },
+      ]);
+    }
     res.status(200).json(recipes);
   } catch (err) {
-    res.status(500).json({ message: "문제가 발생했습니다. " });
+    res.status(500).json({ message: "문제가 발생했습니다." });
   }
 };
-
+// 특정 레시피 조회
 export const getRecipe = async (req, res) => {
   try {
     const recipeId = req.params.id;
@@ -44,7 +43,7 @@ export const getRecipe = async (req, res) => {
       "nickName role profileImageURL"
     );
     if (!recipe) {
-      return res.status(404).json({ message: "레시피를 찾을 수 없습니다 :(" });
+      return res.status(404).json({ message: "레시피를 찾을 수 없습니다." });
     }
     res.status(200).json(recipe);
   } catch (err) {
@@ -158,7 +157,7 @@ export const deleteRecipe = async (req, res) => {
     res.status(500).json({ message: "문제가 발생했습니다." });
   }
 };
-
+// 작성한 레시피
 export const getMyRecipes = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -172,7 +171,7 @@ export const getMyRecipes = async (req, res) => {
     res.status(500).json({ message: "문제가 발생했습니다." });
   }
 };
-
+// 북마크한 레시피
 export const getMyBookmarkRecipes = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -186,7 +185,58 @@ export const getMyBookmarkRecipes = async (req, res) => {
     res.status(500).json({ message: "문제가 발생했습니다." });
   }
 };
+// 마스터셰프
+export const getMasterchief = async (req, res) => {
+  try {
+    const recipes = await Recipe.find();
 
+    // 각 작성자가 작성한 레시피의 likeUsers 배열의 길이를 계산
+    const writerLikesCount = {};
+    recipes.forEach((recipe) => {
+      if (!writerLikesCount[recipe.writer]) {
+        writerLikesCount[recipe.writer] = 0;
+      }
+      writerLikesCount[recipe.writer] += recipe.likeUsers.length;
+    });
+
+    // 가장 많은 likeUsers를 가진 상위 5명의 작성자
+    const topWriters = Object.keys(writerLikesCount)
+      .sort((a, b) => writerLikesCount[b] - writerLikesCount[a])
+      .slice(0, 5);
+
+    const writerInfoAndRecipes = [];
+    // 각 작성자에 대해 반복
+    for (const writerId of topWriters) {
+      // 작성자의 정보 가져오기
+      const writerInfo = await User.findById(writerId);
+      const { nickName, profileImageURL } = writerInfo;
+
+      // 작성자가 작성한 4개의 인기 레시피 가져오기
+      let writerRecipes = await Recipe.find({ writer: writerId })
+        .sort({ createdDate: -1 })
+        .limit(4);
+
+      writerRecipes = await Recipe.aggregate([
+        {
+          $match: { _id: { $in: writerRecipes.map((recipe) => recipe._id) } },
+        },
+        { $addFields: { likeUsersCount: { $size: "$likeUsers" } } },
+        { $sort: { likeUsersCount: -1 } },
+      ]);
+
+      // 작성자 정보와 레시피 정보를 객체에 추가
+      writerInfoAndRecipes.push({
+        nickName,
+        profileImageURL,
+        recipes: writerRecipes,
+      });
+    }
+    res.status(200).json(writerInfoAndRecipes);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "문제가 발생했습니다." });
+  }
+};
 export const getMyRecipesWithPagination = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -225,44 +275,5 @@ export const searchIngredientsRecipes = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "문제가 발생했습니다." });
-  }
-};
-
-export const getFiveStarRecipes = async (req, res) => {
-  try {
-    const defaultLimit = await Recipe.countDocuments({
-      likeCount: { $gte: 20 },
-    }); // defaultLimit - '좋아요' 20개 이상의 글의 '수'
-    const limit = parseInt(req.query.limit) || defaultLimit;
-    let fiveStarRecipes;
-
-    if (limit !== defaultLimit) {
-      if (limit > 0) {
-        fiveStarRecipes = await Recipe.find({
-          likeCount: { $gte: 20 },
-        })
-          .sort({ likeCount: -1 })
-          .limit(limit);
-      } else {
-        // limit 값이 음의 정수인 경우 -> defaultLimit
-        fiveStarRecipes = await Recipe.find({
-          likeCount: { $gte: 20 },
-        })
-          .sort({ likeCount: -1 })
-          .limit(defaultLimit);
-      }
-    } else {
-      fiveStarRecipes = await Recipe.find({
-        likeCount: { $gte: 20 },
-      })
-        .sort({ likeCount: -1 })
-        .limit(defaultLimit);
-    }
-    res
-      .status(200)
-      .json({ message: "5스타 레시피 목록 조회 성공", fiveStarRecipes });
-  } catch (err) {
-    res.status(500).json({ message: "문제가 발생했습니다." });
-    console.log(err);
   }
 };
