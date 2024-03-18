@@ -1,5 +1,4 @@
 import User from "../models/user.js";
-import Fridge from "../models/fridge.js";
 import VerificationCode from "../models/verificationCode.js";
 import hashPassword from "../utils/hashpassword.js";
 import generateToken from "../utils/token.js";
@@ -7,15 +6,9 @@ import generateToken from "../utils/token.js";
 export const login = async (req, res, next) => {
   try {
     const token = generateToken(req.user);
-    let userFridge = await Fridge.findOne({ userId: req.user._id });
-    const { nickName } = await User.findOne({
+    const user = await User.findOne({
       _id: req.user._id,
     });
-
-    if (!userFridge) {
-      userFridge = { ingredients: [] };
-    }
-
     res
       .cookie("t", token, {
         httpOnly: true,
@@ -24,10 +17,11 @@ export const login = async (req, res, next) => {
       .send({
         message: "로그인 성공",
         user: {
-          userId: req.user._id,
-          nickName,
+          userId: user._id,
+          nickName: user.nickName,
+          email: user.email,
+          profileImageURL: user.profileImageURL,
         },
-        fridge: userFridge.ingredients,
       });
   } catch (err) {
     err.status = 500;

@@ -32,7 +32,7 @@ export const addIngredients = async (req, res, next) => {
       userFridge.ingredients.push(...newIngredients);
     }
     await userFridge.save();
-    res.status(201).send(newIngredients);
+    res.status(201).send(userFridge.ingredients);
   } catch (error) {
     next(error);
   }

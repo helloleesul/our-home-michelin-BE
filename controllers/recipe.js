@@ -209,7 +209,7 @@ export const getMasterchief = async (req, res) => {
     for (const writerId of topWriters) {
       // 작성자의 정보 가져오기
       const writerInfo = await User.findById(writerId);
-      const { nickName, profileImageURL } = writerInfo;
+      const { nickName, profileImageURL, _id } = writerInfo;
 
       // 작성자가 작성한 4개의 인기 레시피 가져오기
       let writerRecipes = await Recipe.find({ writer: writerId })
@@ -226,6 +226,7 @@ export const getMasterchief = async (req, res) => {
 
       // 작성자 정보와 레시피 정보를 객체에 추가
       writerInfoAndRecipes.push({
+        _id,
         nickName,
         profileImageURL,
         recipes: writerRecipes,
