@@ -32,7 +32,10 @@ export const addIngredients = async (req, res, next) => {
       userFridge.ingredients.push(...newIngredients);
     }
     await userFridge.save();
-    res.status(201).send(userFridge.ingredients);
+    res.status(201).send({
+      message: "재료가 추가되었습니다.",
+      ingredients: userFridge.ingredients,
+    });
   } catch (error) {
     next(error);
   }
@@ -60,7 +63,10 @@ export const updateBestBefore = async (req, res, next) => {
         .json({ message: "냉장고 또는 재료를 찾을 수 없습니다. " });
     }
 
-    res.status(200).json({ message: "유통기한이 업데이트 되었습니다." });
+    res.status(200).json({
+      message: "유통기한이 수정되었습니다.",
+      ingredients: updatedFridge.ingredients,
+    });
   } catch (error) {
     next(error);
   }
@@ -81,7 +87,10 @@ export const deleteIngredient = async (req, res, next) => {
       return res.status(404).json({ message: "냉장고를 찾을 수 없습니다." });
     }
 
-    res.status(200).json({ message: "재료가 삭제되었습니다." });
+    res.status(200).json({
+      message: "재료가 삭제되었습니다.",
+      ingredients: updatedFridge.ingredients,
+    });
   } catch (error) {
     next(error);
   }
