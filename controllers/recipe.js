@@ -157,7 +157,7 @@ export const deleteRecipe = async (req, res) => {
     res.status(500).json({ message: "문제가 발생했습니다." });
   }
 };
-// 작성한 레시피
+// 작성한 레시피 조회
 export const getMyRecipes = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -171,7 +171,7 @@ export const getMyRecipes = async (req, res) => {
     res.status(500).json({ message: "문제가 발생했습니다." });
   }
 };
-// 북마크한 레시피
+// 북마크한 레시피 조회
 export const getMyBookmarkRecipes = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -185,7 +185,7 @@ export const getMyBookmarkRecipes = async (req, res) => {
     res.status(500).json({ message: "문제가 발생했습니다." });
   }
 };
-// 마스터셰프
+// 마스터셰프 조회
 export const getMasterchief = async (req, res) => {
   try {
     const recipes = await Recipe.find();
@@ -238,6 +238,26 @@ export const getMasterchief = async (req, res) => {
     res.status(500).json({ message: "문제가 발생했습니다." });
   }
 };
+// 냉장고 재료 기반 레시피 조회
+export const searchIngredientsRecipes = async (req, res) => {
+  try {
+    const { ingredients } = req.body;
+
+    const query = {
+      "ingredients.name": { $in: ingredients },
+    };
+    if (req.query.type) {
+      query.recipeType = req.query.type;
+    }
+    const recipes = await Recipe.find(query);
+
+    res.json(recipes);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "문제가 발생했습니다." });
+  }
+};
+
 export const getMyRecipesWithPagination = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -258,21 +278,6 @@ export const getMyRecipesWithPagination = async (req, res) => {
       myRecipes,
       totalPages,
     });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "문제가 발생했습니다." });
-  }
-};
-
-export const searchIngredientsRecipes = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const { ingredients } = req.body;
-    const recipes = await Recipe.find({
-      "ingredients.name": { $in: ingredients },
-    });
-
-    res.json(recipes);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "문제가 발생했습니다." });
