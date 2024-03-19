@@ -54,7 +54,7 @@ export const updateBestBefore = async (req, res, next) => {
 
     const updatedFridge = await Fridge.findOneAndUpdate(
       { userId: userId, "ingredients._id": ingredientId },
-      { "ingredients.$.bestBefore": new Date(newBestBefore) },
+      { "ingredients.$.bestBefore": newBestBefore },
       { new: true }
     );
 
