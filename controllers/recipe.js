@@ -7,7 +7,6 @@ export const getAllRecipes = async (req, res) => {
     const defaultLimit = await Recipe.countDocuments();
 
     let limit = defaultLimit;
-
     const tmpLimit = parseInt(req.query.limit);
     if (limit > 0) {
       limit = tmpLimit;
@@ -244,7 +243,7 @@ export const searchIngredientsRecipes = async (req, res) => {
     const { ingredients } = req.body;
 
     const query = {
-      "ingredients.name": { $in: ingredients },
+      "ingredients.name": { $regex: ingredients.join("|") },
     };
     if (req.query.type) {
       query.recipeType = req.query.type;
