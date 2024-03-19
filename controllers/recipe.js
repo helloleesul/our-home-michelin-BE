@@ -1,6 +1,28 @@
 import Recipe from "../models/recipe.js";
 import User from "../models/user.js";
 
+// 인기 레시피 정렬 (공통)
+const sortedRecipes = async (req, recipes) => {
+  if (req.query.sort === "popular") {
+    recipes = await Recipe.aggregate([
+      {
+        $match: { _id: { $in: recipes.map((recipe) => recipe._id) } },
+      },
+      { $addFields: { likeUsersCount: { $size: "$likeUsers" } } },
+      { $sort: { likeUsersCount: -1 } },
+    ]);
+  }
+  return recipes;
+};
+// 페이지네이션 (공통)
+const pagenation = async (req, defaultLimit) => {
+  const currentPage = parseInt(req.query.page) || 1;
+  const perPage = parseInt(req.query.perPage) || 10;
+  const totalPages = Math.ceil(defaultLimit / perPage);
+  const offset = (currentPage - 1) * perPage;
+  return { offset, totalPages, perPage };
+};
+
 // 전체 레시피 조회
 export const getAllRecipes = async (req, res) => {
   try {
@@ -8,27 +30,19 @@ export const getAllRecipes = async (req, res) => {
 
     let limit = defaultLimit;
     const tmpLimit = parseInt(req.query.limit);
-    if (limit > 0) {
-      limit = tmpLimit;
-    }
+    if (limit > 0) limit = tmpLimit;
+
+    const { offset, totalPages, perPage } = await pagenation(req, defaultLimit);
 
     let recipes;
     recipes = await Recipe.find(
       req.query.type && { recipeType: req.query.type }
     )
       .sort({ createdDate: -1 })
-      .limit(limit);
-
-    if (req.query.sort === "popular") {
-      recipes = await Recipe.aggregate([
-        {
-          $match: { _id: { $in: recipes.map((recipe) => recipe._id) } },
-        },
-        { $addFields: { likeUsersCount: { $size: "$likeUsers" } } },
-        { $sort: { likeUsersCount: -1 } },
-      ]);
-    }
-    res.status(200).json(recipes);
+      .skip(offset)
+      .limit(perPage);
+    recipes = await sortedRecipes(req, recipes);
+    res.status(200).json({ recipes, totalPages });
   } catch (err) {
     res.status(500).json({ message: "문제가 발생했습니다." });
   }
@@ -156,15 +170,24 @@ export const deleteRecipe = async (req, res) => {
     res.status(500).json({ message: "문제가 발생했습니다." });
   }
 };
-// 작성한 레시피 조회
+// 나의 레시피 조회
 export const getMyRecipes = async (req, res) => {
   try {
     const userId = req.user._id;
-    const myRecipes = await Recipe.find({ writer: userId }).sort({
-      createdDate: -1,
-    });
+    const myRecipes = await Recipe.find({ writer: userId });
 
-    res.status(200).json(myRecipes);
+    const { offset, totalPages, perPage } = await pagenation(
+      req,
+      myRecipes.length
+    );
+
+    let recipes = await Recipe.find({ writer: userId })
+      .sort({
+        createdDate: -1,
+      })
+      .skip(offset)
+      .limit(perPage);
+    res.status(200).json({ recipes, totalPages });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "문제가 발생했습니다." });
@@ -174,11 +197,20 @@ export const getMyRecipes = async (req, res) => {
 export const getMyBookmarkRecipes = async (req, res) => {
   try {
     const userId = req.user._id;
-    const myRecipes = await Recipe.find({ likeUsers: userId }).sort({
-      createdDate: -1,
-    });
+    const myRecipes = await Recipe.find({ likeUsers: userId });
 
-    res.status(200).json(myRecipes);
+    const { offset, totalPages, perPage } = await pagenation(
+      req,
+      myRecipes.length
+    );
+
+    let recipes = await Recipe.find({ likeUsers: userId })
+      .sort({
+        createdDate: -1,
+      })
+      .skip(offset)
+      .limit(perPage);
+    res.status(200).json({ recipes, totalPages });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "문제가 발생했습니다." });
@@ -248,35 +280,16 @@ export const searchIngredientsRecipes = async (req, res) => {
     if (req.query.type) {
       query.recipeType = req.query.type;
     }
-    const recipes = await Recipe.find(query);
 
-    res.json(recipes);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "문제가 발생했습니다." });
-  }
-};
+    const defaultRecipes = (await Recipe.find(query)).length;
+    const { offset, totalPages, perPage } = await pagenation(
+      req,
+      defaultRecipes
+    );
 
-export const getMyRecipesWithPagination = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const currentPage = parseInt(req.query.page);
-    const perPage = parseInt(req.query.perPage);
-
-    const totalRecipes = await Recipe.countDocuments({ writer: userId });
-    const totalPages = Math.ceil(totalRecipes / perPage);
-
-    const offset = (currentPage - 1) * perPage;
-
-    const myRecipes = await Recipe.find({ writer: userId })
-      .sort({ createdDate: -1 })
-      .skip(offset)
-      .limit(perPage);
-
-    res.status(200).json({
-      myRecipes,
-      totalPages,
-    });
+    let recipes = await Recipe.find(query).skip(offset).limit(perPage);
+    recipes = await sortedRecipes(req, recipes);
+    res.json({ recipes, totalPages });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "문제가 발생했습니다." });
