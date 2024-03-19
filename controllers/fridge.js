@@ -3,11 +3,12 @@ import Fridge from "../models/fridge.js";
 export const getIngredients = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    const userFridge = await Fridge.findOne({ userId: userId });
+    let userFridge = await Fridge.findOne({ userId: userId });
 
     if (!userFridge) {
-      return res.status(404).json({ message: "냉장고를 찾을 수 없습니다." });
+      userFridge = new Fridge({ userId: userId, ingredients: [] });
     }
+
     res.json(userFridge.ingredients);
   } catch (error) {
     next(error);
