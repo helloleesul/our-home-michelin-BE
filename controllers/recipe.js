@@ -273,6 +273,9 @@ export const getMasterchief = async (req, res) => {
 export const searchIngredientsRecipes = async (req, res) => {
   try {
     const { ingredients } = req.body;
+    if (!ingredients.length) {
+      return res.json({ message: "냉장고에 재료가 없습니다." });
+    }
 
     const query = {
       "ingredients.name": { $regex: ingredients.join("|") },
