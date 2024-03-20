@@ -4,14 +4,11 @@ import mongoose from "mongoose";
 import passport from "passport";
 import dotenv from "dotenv";
 import setUpPassport from "./middlewares/passport/index.js";
-import upload from "./middlewares/image.js";
 
 import userRoutes from "./routes/user.js";
 import authRoutes from "./routes/auth.js";
-import { sendVerificationCode, verifyCode } from "./controllers/mailer.js";
 import recipeRouter from "./routes/recipe.js";
 import fridgeRouter from "./routes/fridge.js";
-import editorRouter from "./routes/editor.js";
 import likeRecipesRouter from "./routes/likeRecipes.js";
 
 dotenv.config();
@@ -26,19 +23,10 @@ app.use(passport.initialize());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.post("/signup", sendVerificationCode);
-app.post("/verify", verifyCode);
-app.post("/recipes/upload-image", upload.single("image"), (req, res) => {
-  const host = req.get("host");
-  const imageUrl = `${req.protocol}://${host}/uploads/${req.file.originalname}`;
-  res.json({ imageUrl });
-});
-
 app.use(authRoutes);
 app.use(userRoutes);
 app.use(recipeRouter);
 app.use(fridgeRouter);
-app.use(editorRouter);
 app.use(likeRecipesRouter);
 
 app.use((error, req, res, next) => {
@@ -50,9 +38,6 @@ app.use((error, req, res, next) => {
   });
 });
 
-app.post("/upload", upload.single("uploadRecipeImg"), function (req, res) {
-  res.send("이미지 multer 서버 업로드 완료");
-});
 app.use("/uploads", express.static("uploads"));
 
 const startServer = async () => {
