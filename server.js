@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import passport from "passport";
 import dotenv from "dotenv";
 import setUpPassport from "./middlewares/passport/index.js";
+import cors from "cors";
 
 import userRoutes from "./routes/user.js";
 import authRoutes from "./routes/auth.js";
@@ -18,6 +19,12 @@ const port = process.env.PORT || 3000;
 
 setUpPassport();
 app.use(cookieParser(process.env.JWT_SECRET));
+
+const corsOptions = {
+  credentials: true,
+  origin: process.env.ORIGIN,
+};
+app.use(cors(corsOptions));
 
 app.use(passport.initialize());
 app.use(express.json());

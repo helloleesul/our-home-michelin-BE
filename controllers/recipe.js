@@ -243,9 +243,9 @@ export const getMasterchief = async (req, res) => {
       const { nickName, profileImageURL, _id } = writerInfo;
 
       // 작성자가 작성한 4개의 인기 레시피 가져오기
-      let writerRecipes = await Recipe.find({ writer: writerId })
-        .sort({ createdDate: -1 })
-        .limit(4);
+      let writerRecipes = await Recipe.find({ writer: writerId }).sort({
+        createdDate: -1,
+      });
 
       writerRecipes = await Recipe.aggregate([
         {
@@ -253,6 +253,7 @@ export const getMasterchief = async (req, res) => {
         },
         { $addFields: { likeUsersCount: { $size: "$likeUsers" } } },
         { $sort: { likeUsersCount: -1 } },
+        { $limit: 4 },
       ]);
 
       // 작성자 정보와 레시피 정보를 객체에 추가
