@@ -6,6 +6,8 @@ import upload from "../middlewares/image.js";
 const recipeRouter = express.Router();
 // 전체 레시피 조회
 recipeRouter.get("/api/recipes", recipeController.getAllRecipes);
+// 인기 레시피 조회
+recipeRouter.get("/api/popular-recipes", recipeController.getPopularRecipes);
 // 특정 레시피 조회
 recipeRouter.get("/api/recipes/:id", recipeController.getRecipe);
 // 새 레시피 작성
