@@ -11,8 +11,11 @@ export const login = async (req, res, next) => {
     });
     res
       .cookie("t", token, {
+        domain: process.env.ORIGIN,
         httpOnly: true,
         signed: true,
+        sameSire: "None",
+        secure: true,
       })
       .send({
         message: "로그인 성공",

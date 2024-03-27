@@ -18,7 +18,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 setUpPassport();
-app.use(cookieParser(process.env.JWT_SECRET, { domain: process.env.ORIGIN }));
+app.use(cookieParser(process.env.JWT_SECRET));
 
 const corsOptions = {
   credentials: true,
