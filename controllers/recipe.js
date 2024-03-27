@@ -17,7 +17,7 @@ const sortedRecipes = async (req, recipes) => {
 // 페이지네이션 (공통)
 const pagenation = async (req, defaultLimit) => {
   const currentPage = parseInt(req.query.page) || 1;
-  const perPage = parseInt(req.query.perPage) || 10;
+  const perPage = parseInt(req.query.perPage) || 12;
   const totalPages = Math.ceil(defaultLimit / perPage);
   const offset = (currentPage - 1) * perPage;
   return { offset, totalPages, perPage };
@@ -40,7 +40,7 @@ export const getAllRecipes = async (req, res) => {
     )
       .sort({ createdDate: -1 })
       .skip(offset)
-      .limit(perPage);
+      .limit(limit ? limit : perPage);
     recipes = await sortedRecipes(req, recipes);
     res.status(200).json({ recipes, totalPages });
   } catch (err) {
