@@ -11,9 +11,11 @@ export const login = async (req, res, next) => {
     });
     res
       .cookie("t", token, {
+        domain: "our-home-michelin-git-dev-helloleesuls-projects.vercel.app",
         httpOnly: true,
         signed: true,
-        sameSite: "None",
+        sameSite: "none",
+        secure: true,
       })
       .send({
         message: "로그인 성공",
