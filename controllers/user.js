@@ -15,6 +15,7 @@ export const getUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     let { nickName, password, profileImageURL } = req.body;
+    const currentDomain = req.protocol + "://" + req.get("host");
 
     if (req.file) {
       const imgFileData = {
@@ -23,7 +24,7 @@ export const updateUser = async (req, res) => {
         ext: req.file.mimetype.split("/")[1],
       };
 
-      profileImageURL = `/${imgFileData.path}`;
+      profileImageURL = `${currentDomain}/${imgFileData.path}`;
     }
 
     let userUpdateData = {};
