@@ -13,8 +13,6 @@ export const login = async (req, res, next) => {
       .cookie("t", token, {
         httpOnly: true,
         signed: true,
-        sameSite: "none",
-        secure: true,
       })
       .send({
         message: "로그인 성공",
