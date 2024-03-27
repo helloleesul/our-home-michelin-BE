@@ -21,6 +21,7 @@ setUpPassport();
 app.use(cookieParser(process.env.JWT_SECRET));
 
 const corsOptions = {
+  credentials: true,
   origin: process.env.ORIGIN,
 };
 app.use(cors(corsOptions));
