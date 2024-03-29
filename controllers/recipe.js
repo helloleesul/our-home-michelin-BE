@@ -77,7 +77,6 @@ export const writeRecipe = async (req, res) => {
       writer,
       uploadRecipeImg,
     } = req.body;
-    const currentDomain = req.protocol + "://" + req.get("host");
 
     if (req.file) {
       const imgFileData = {
@@ -86,7 +85,7 @@ export const writeRecipe = async (req, res) => {
         ext: req.file.mimetype.split("/")[1],
       };
 
-      uploadRecipeImg = `${currentDomain}/${imgFileData.path}`;
+      uploadRecipeImg = `/${imgFileData.path}`;
     }
 
     const newRecipe = await Recipe.create({
@@ -119,8 +118,8 @@ export const updateRecipe = async (req, res) => {
       uploadRecipeImg,
     } = req.body;
     const recipeId = req.params.id;
+
     const existingRecipe = await Recipe.findById(recipeId);
-    const currentDomain = req.protocol + "://" + req.get("host");
 
     if (!existingRecipe) {
       return res.status(404).json({ message: "레시피를 찾을 수 없습니다." });
@@ -132,7 +131,7 @@ export const updateRecipe = async (req, res) => {
         name: req.file.originalname,
         ext: req.file.mimetype.split("/")[1],
       };
-      uploadRecipeImg = `${currentDomain}/${imgFileData.path}`;
+      uploadRecipeImg = `/${imgFileData.path}`;
     }
 
     const recipeUpdateData = {
