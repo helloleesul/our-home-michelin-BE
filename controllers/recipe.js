@@ -43,7 +43,7 @@ export const getPopularRecipes = async (req, res) => {
       { $sort: { likeUsersCount: -1 } },
       { $limit: 10 },
     ]);
-    res.status(200).json({ recipes });
+    res.status(200).json(recipes);
   } catch (err) {
     res.status(500).json({ message: "문제가 발생했습니다." });
   }
