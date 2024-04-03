@@ -13,17 +13,17 @@ const pagination = async (req, defaultLimit) => {
 
 // 전체 레시피 조회
 export const getAllRecipes = async (req, res) => {
+  const filter =
+    req.query.type && req.query.type !== "all"
+      ? { recipeType: req.query.type }
+      : {};
   try {
-    const defaultLimit = await Recipe.countDocuments(
-      req.query.type && { recipeType: req.query.type }
-    );
+    const defaultLimit = await Recipe.countDocuments(filter);
 
     const { offset, totalPages, perPage } = await pagination(req, defaultLimit);
 
     let recipes;
-    recipes = await Recipe.find(
-      req.query.type && { recipeType: req.query.type }
-    )
+    recipes = await Recipe.find(filter)
       .sort({ createdDate: -1 })
       .skip(offset)
       .limit(perPage);
@@ -276,6 +276,8 @@ export const getMasterchief = async (req, res) => {
 export const searchIngredientsRecipes = async (req, res) => {
   try {
     const { ingredients } = req.body;
+    console.log("🚀 ~ body:", req.body);
+
     if (!ingredients.length) {
       return res.json({ message: "냉장고에 재료가 없습니다." });
     }
@@ -283,11 +285,13 @@ export const searchIngredientsRecipes = async (req, res) => {
     const query = {
       "ingredients.name": { $regex: ingredients.join("|") },
     };
-    if (req.query.type) {
+
+    if (req.query.type && req.query.type !== "all") {
       query.recipeType = req.query.type;
     }
 
     const defaultRecipes = (await Recipe.find(query)).length;
+
     const { offset, totalPages, perPage } = await pagination(
       req,
       defaultRecipes
