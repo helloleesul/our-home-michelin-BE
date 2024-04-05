@@ -45,7 +45,7 @@ app.use((error, req, res, next) => {
   });
 });
 
-app.use("/uploads", express.static("uploads"));
+// app.use("/uploads", express.static("uploads"));
 
 const startServer = async () => {
   try {

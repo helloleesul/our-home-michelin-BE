@@ -1,7 +1,7 @@
 import express from "express";
 import passport from "passport";
 import * as recipeController from "../controllers/recipe.js";
-import upload from "../middlewares/image.js";
+// import upload from "../middlewares/image.js";
 
 const recipeRouter = express.Router();
 // 전체 레시피 조회
@@ -13,14 +13,14 @@ recipeRouter.get("/api/recipes/:id", recipeController.getRecipe);
 // 새 레시피 작성
 recipeRouter.post(
   "/api/recipes",
-  upload.single("uploadRecipeImg"),
+  // upload.single("uploadRecipeImg"),
   passport.authenticate("jwt", { session: false }),
   recipeController.writeRecipe
 );
 // 레시피 수정
 recipeRouter.patch(
   "/api/recipes/:id",
-  upload.single("uploadRecipeImg"),
+  // upload.single("uploadRecipeImg"),
   passport.authenticate("jwt", { session: false }),
   recipeController.updateRecipe
 );

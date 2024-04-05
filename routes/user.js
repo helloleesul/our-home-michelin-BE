@@ -6,7 +6,7 @@ import {
   deleteUser,
   confirmPassword,
 } from "../controllers/user.js";
-import upload from "../middlewares/image.js";
+// import upload from "../middlewares/image.js";
 
 const router = express.Router();
 
@@ -20,7 +20,7 @@ router.get(
 router.patch(
   "/api/myinfo",
   passport.authenticate("jwt", { session: false }),
-  upload.single("profileImageURL"),
+  // upload.single("profileImageURL"),
   updateUser
 );
 // 회원 탈퇴
